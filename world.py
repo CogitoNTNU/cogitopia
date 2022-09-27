@@ -21,9 +21,23 @@ class world:
         pic = [[noise([i / xpix, j / ypix]) for j in range(xpix)] for i in range(ypix)]
         for j in range(xpix):
             for i in range(ypix):
-                world.grid[0][j][i] = abs(pic[j][i]) * 180 + 75
+                world.grid[0][j][i] = abs(pic[j][i])
+    def step_grass(self,stepsize = 0.005):
+        world.grid[0] += world.grid[1]*stepsize
+        world.grid[0]*=(1-abs(world.grid[0]-world.grid[1]))
+        world.grid[0] = np.clip(world.grid[0],0,1)
+        world.step_earth(self)
+    def step_earth(self,stepsize = 0.1):
+        world.grid[1]*=(1-(world.grid[0])*stepsize)
+        world.grid[1]+=stepsize*0.005
+        world.grid[1] = np.clip(world.grid[1], 0, 1)
     def initialize_earth(self):
-        world.grid[1].fill(100)
+        noise = PerlinNoise(octaves=5, seed=10)
+        xpix, ypix = world.gridsize, world.gridsize
+        pic = [[noise([i / xpix, j / ypix]) for j in range(xpix)] for i in range(ypix)]
+        for j in range(xpix):
+            for i in range(ypix):
+                world.grid[1][j][i] = abs(pic[j][i])
     def get_grid(self):
         return world.grid
     def neighborPoints(self, i, j):

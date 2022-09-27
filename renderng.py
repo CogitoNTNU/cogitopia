@@ -7,7 +7,7 @@ class rendering:
     def draw_grass(grid,screen):
             for y in range(len(grid[0])):
                 for x in range(len(grid[0][0])):
-                        pygame.draw.rect(screen, (0, grid[layer_dict['grass']][y][x], 0), (50*x, 50*y, 50, 50))
+                        pygame.draw.rect(screen, (0, grid[layer_dict['grass']][y][x]* 180 + 75, 0), (50*x, 50*y, 50, 50))
     def draw_player(grid,screen):
             for y in range(len(grid[0])):
                 for x in range(len(grid[0][0])):
@@ -16,7 +16,7 @@ class rendering:
     def draw_earth(grid,screen):
         for y in range(len(grid[0])):
             for x in range(len(grid[0][0])):
-                pygame.draw.rect(screen, (grid[layer_dict['earth']][y][x], grid[layer_dict['earth']][y][x]*0.6, 0), (50 * x, 50 * y, 50, 50))
+                pygame.draw.rect(screen, (grid[layer_dict['earth']][y][x]* 180 + 75, grid[layer_dict['earth']][y][x]*0.6* 180 + 75, 0), (50 * x, 50 * y, 50, 50))
     def draw_water(grid,screen):
         for y in range(len(grid[0])):
             for x in range(len(grid[0][0])):
