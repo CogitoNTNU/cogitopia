@@ -1,15 +1,15 @@
 import pygame
 from random import randrange
 import numpy as np
-from numba import njit
+#from numba import njit
 from perlin_noise import PerlinNoise
 from renderng import rendering
-from world import world
+from world import World
 pygame.init()
 
 screen = pygame.display.set_mode([800, 800])
 
-world = world(20)
+world = World(20)
 running = True
 clock = pygame.time.Clock()
 while running:
