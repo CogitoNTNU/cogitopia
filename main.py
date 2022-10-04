@@ -3,6 +3,8 @@ from random import randrange
 import numpy as np
 from numba import njit
 from perlin_noise import PerlinNoise
+from creature import Creature
+from renderng import rendering
 
 pygame.init()
 grid_size = 20
@@ -35,15 +37,19 @@ def draw_grid(grid):
 if __name__ == '__main__':
     grid = noise_func(grid_size)
     grid[1][4][5] = 50
-
+    c = Creature(5,5,1)
+    clock = pygame.time.Clock()
     running = True
     while running:
+        screen.fill((0, 150, 0))
+        grid = draw_grid(grid)
+        rendering.draw_creature(c,screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            screen.fill((0, 150, 0))
-            grid = draw_grid(grid)
-
         pygame.display.flip()
+        c.turn(1)
+        c.step()
+        clock.tick(1)
 
     pygame.quit()
