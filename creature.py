@@ -2,6 +2,8 @@ import pygame
 import numpy as np
 from random import randrange
 import random
+from world import World
+
 grid_size=20
 (N,W,S,E)=[0,1,2,3]
 class Creature:
@@ -9,20 +11,31 @@ class Creature:
         self.x=x
         self.y=y
         self.d=randrange(3)
+
+
+    def turn(self,vison):
+        turning = np.random.randint(0,3)
+        if self.d == 1 and turning == 2:
+            self.d = W
+        elif self.d == 4 and turning == 1:
+            self.d = N
+        elif turning == 2:
+            self.d = self.d - 1
+        else:
+            self.d = self.d + turning
+
     def step(self):
-            if self.d==N:
-                self.d=random.choice((N,W,E)) #bestemmer ny retning
-                if self.d==N:
-                    self.y=(self.y+1)%grid_size
-            elif self.d==W:
-                self.d=random.choice((N,W,S))
-                if self.d==W:
-                    self.x=(self.x+1)%grid_size
-            elif self.d==S:
-                self.d=random.choice((S,W,E))
-                if self.d==S:
-                    self.y=(self.y-1)%grid_size
-            elif self.d==E:
-                self.d=random.choice((E,N,S))
-                if self.d==E:
-                    self.x=(self.x-1)%grid_size
+        if self.d == N:
+            self.y = (self.y+1)%grid_size
+        elif self.d == S:
+            self.y = (self.y-1)%grid_size
+        elif self.d == E:
+            self.x = (self.x-1)%grid_size
+        elif self.d == W:
+            self.x = (self.x+1)%grid_size
+        elif self.d == 0:
+            self.x = self.x
+            self.y = self.y
+
+    def vision(self,world):
+        np.argwhere(max(world))

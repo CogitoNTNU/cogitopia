@@ -30,13 +30,6 @@ while running:
 
         #rendering.draw_player(grid,screen)
         #rendering.draw_earth(grid,screen)
-
-
-
-
-
-
-
     pygame.display.flip()
 
 
