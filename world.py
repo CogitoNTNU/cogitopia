@@ -4,7 +4,7 @@ import numpy as np
 from numba import njit
 from perlin_noise import PerlinNoise
 
-class world:
+class World:
     griddepth = 10
     grid = None
     gridsize = None
