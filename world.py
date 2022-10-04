@@ -30,6 +30,11 @@ class World:
         #World.grid[0]*=(1-abs(World.grid[0]-World.grid[1]))
         World.grid[0] = np.clip(World.grid[0],0,1)
         World.step_earth(self)
+
+    def get_grass(self, x, y):
+        return World.grid[0][x][y]
+
+
     def step_earth(self,stepsize = 0.1):
         World.grid[1]*=(1-(World.grid[0])*stepsize)
         World.grid[1]+=stepsize*0.005
@@ -41,6 +46,11 @@ class World:
         for j in range(xpix):
             for i in range(ypix):
                 World.grid[1][j][i] = abs(pic[j][i])
+
+    def get_earth(self, x, y):
+        return World.grid[1][x][y]
+
+
     def initialize_temp(self):
         noise = PerlinNoise(octaves=5, seed=10)
         xpix, ypix = World.gridsize, World.gridsize
@@ -48,6 +58,11 @@ class World:
         for j in range(xpix):
             for i in range(ypix):
                 World.grid[3][j][i] = abs(pic[j][i])
+
+    def get_temp(self, x, y):
+        return World.grid[3][x][y]
+
+
     def initialize_heigh(self):
         noise = PerlinNoise(octaves=5, seed=10)
         xpix, ypix = World.gridsize, World.gridsize
@@ -55,10 +70,18 @@ class World:
         for j in range(xpix):
             for i in range(ypix):
                 World.grid[4][j][i] = abs(pic[j][i])
+
+    def get_height(self, x, y):
+        return World.grid[4][x][y]
+
+
     def initialize_water(self):
         World.grid[2].fill(0)
         World.grid[2][2][2]=1
         World.grid[2][1][0]=1
+
+    def get_water(self, x, y):
+        return World.grid[2][x][y]
 
     def step_water(self):
         for j in range(World.gridsize):
