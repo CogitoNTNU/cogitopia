@@ -25,7 +25,7 @@ class world:
         for j in range(xpix):
             for i in range(ypix):
                 world.grid[0][j][i] = abs(pic[j][i])
-    def step_grass(self,stepsize = 0.05):
+    def step_grass(self,stepsize = 0.005):
         world.grid[0] += world.grid[1]*stepsize
         #world.grid[0]*=(1-abs(world.grid[0]-world.grid[1]))
         world.grid[0] = np.clip(world.grid[0],0,1)
