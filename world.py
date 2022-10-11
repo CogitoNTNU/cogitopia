@@ -8,6 +8,7 @@ class world:
     griddepth = 10
     grid = None
     gridsize = None
+    time = 0
     def __init__(self,gridsize):
         world.gridsize = gridsize
         xpix, ypix = gridsize, gridsize
@@ -17,6 +18,10 @@ class world:
         world.initialize_temp(self)
         world.initialize_heigh(self)
         world.initialize_water(self)
+        world.initialize_sun_intensity(self)
+
+    def step_time(self,stepsize=1):
+        world.time = (world.time + stepsize) % 24
 
     def initialize_grass(self):
         noise = PerlinNoise(octaves=5, seed=10)
@@ -59,6 +64,8 @@ class world:
         world.grid[2].fill(0)
         world.grid[2][2][2]=1
         world.grid[2][1][0]=1
+    def initialize_sun_intensity(self):
+        world.grid[5].fill(0)
 
     def step_water(self):
         for j in range(world.gridsize):
@@ -69,7 +76,16 @@ class world:
                             world.grid[2][neighbor[0]][neighbor[1]] += 0.01*(1-world.grid[2][neighbor[0]][neighbor[1]])
                             world.grid[2][j][i] -= 0.01*(1-world.grid[2][neighbor[0]][neighbor[1]])
                             world.grid[2] = np.clip(world.grid[2], 0, 1)
-
+    def step_temp(self):
+        for j in range(world.gridsize):
+            for i in range(world.gridsize):
+                    for neighbor in world.neighborPoints(self,i,j):
+                        if world.grid[3][neighbor[0]][neighbor[1]]- world.grid[3][j][i] < 0:
+                            world.grid[3][neighbor[0]][neighbor[1]] += 0.01*(1-world.grid[3][neighbor[0]][neighbor[1]])
+                            world.grid[3][j][i] -= 0.01*(1-world.grid[3][neighbor[0]][neighbor[1]])
+                            world.grid[3] = np.clip(world.grid[3], 0, 1)
+    def step_sun(self):
+        world.grid[5].fill(world.time)
 
 
     def get_grid(self):

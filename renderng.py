@@ -1,7 +1,7 @@
 
 import numpy as np
 import pygame
-layer_dict = {'grass' : 0, 'earth' : 1, 'water' : 2 ,'player' : 10,'temperature':3,'heigh':4}
+layer_dict = {'grass' : 0, 'earth' : 1, 'water' : 2 ,'player' : 10,'temperature':3,'heigh':4, 'sun':5}
 
 class rendering:
     def draw_grass(grid,screen):
@@ -30,6 +30,12 @@ class rendering:
         for y in range(len(grid[0])):
             for x in range(len(grid[0][0])):
                 pygame.draw.rect(screen, (grid[layer_dict['heigh']][y][x]*200,grid[layer_dict['heigh']][y][x]*200,grid[layer_dict['heigh']][y][x]*200), (50 * x, 50 * y, 50, 50))
+    def draw_sun(grid,screen):
+        for y in range(len(grid[0])):
+            for x in range(len(grid[0][0])):
+                pygame.draw.rect(screen, (grid[layer_dict['sun']][y][x]*7,grid[layer_dict['sun']][y][x]*7,0), (50 * x, 50 * y, 50, 50))
+
+
         
 
 
