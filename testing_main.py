@@ -3,7 +3,7 @@ from random import randrange
 import numpy as np
 from numba import njit
 from perlin_noise import PerlinNoise
-from renderng import rendering
+from rendering import rendering
 from world import world
 pygame.init()
 
