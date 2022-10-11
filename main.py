@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from perlin_noise import PerlinNoise
+from perlin_noise import perlin_noise
 from creature import Creature
 from rendering import rendering
 from world import World
@@ -13,7 +13,7 @@ screen = pygame.display.set_mode([grid_size * cell_size, grid_size * cell_size])
 
 
 def noise_func(size):
-    noise = PerlinNoise(octaves=5, seed=10)
+    noise = perlin_noise(octaves=5, seed=10)
 
     x_cells, y_cells = size, size
     grid = np.zeros((2, x_cells, y_cells))
