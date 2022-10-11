@@ -1,15 +1,9 @@
 import pygame
-from random import randrange
 import numpy as np
-from numba import njit
 from perlin_noise import PerlinNoise
 from creature import Creature
 from rendering import rendering
-
-pygame.init()
-grid_size = 20
-cell_size = 32
-screen = pygame.display.set_mode([grid_size * cell_size, grid_size * cell_size])
+from world import World
 
 
 def noise_func(size):
@@ -40,21 +34,27 @@ def draw_grid(grid):
 
 
 if __name__ == '__main__':
-    grid = noise_func(grid_size)
-    grid[1][4][5] = 50
-    c = Creature(5, 5, 1)
+    pygame.init()
+    grid_size = 20
+    cell_size = 50
+    screen = pygame.display.set_mode([grid_size * cell_size, grid_size * cell_size])
+    world = World(grid_size)
+    creatures = [Creature(5, 5), Creature(7, 5), Creature(5, 10)]
     clock = pygame.time.Clock()
     running = True
     while running:
-        screen.fill((0, 150, 0))
-        grid = draw_grid(grid)
-        rendering.draw_creature(c, screen)
+        screen.fill((0, 100, 0))
+        rendering.draw_grass(world.get_grid(), screen)
+        for c in creatures:
+            rendering.draw_creature(c, screen)
+            world.eat_grass(c.y, c.x)
+            c.turn()
+            c.step()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        world.step_grass()
         pygame.display.flip()
-        c.turn(1)
-        c.step()
         clock.tick(1)
 
     pygame.quit()
