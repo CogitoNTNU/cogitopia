@@ -37,7 +37,7 @@ class rendering:
     def draw_sun(grid,screen):
         for y in range(len(grid[0])):
             for x in range(len(grid[0][0])):
-                pygame.draw.rect(screen, (grid[layer_dict['sun']][y][x]*7,grid[layer_dict['sun']][y][x]*7,0), (50 * x, 50 * y, 50, 50))
+                pygame.draw.rect(screen, (abs((grid[layer_dict['sun']][y][x]*200)),abs(grid[layer_dict['sun']][y][x]*200),0), (50 * x, 50 * y, 50, 50))
 
     def draw_creature(c, screen):
         (N, W, S, E) = [0, 1, 2, 3]

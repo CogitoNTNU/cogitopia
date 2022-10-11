@@ -1,4 +1,5 @@
 import pygame
+from numpy import random
 from random import randrange
 import numpy as np
 from numba import njit
@@ -21,7 +22,7 @@ class world:
         world.initialize_sun_intensity(self)
 
     def step_time(self,stepsize=1):
-        world.time = (world.time + stepsize) % 24
+        world.time = (world.time + stepsize)%24
 
     def initialize_grass(self):
         noise = PerlinNoise(octaves=5, seed=10)
@@ -85,7 +86,13 @@ class world:
                             world.grid[3][j][i] -= 0.01*(1-world.grid[3][neighbor[0]][neighbor[1]])
                             world.grid[3] = np.clip(world.grid[3], 0, 1)
     def step_sun(self):
-        world.grid[5].fill(world.time)
+        world.grid[5] = np.transpose(world.grid[5])
+        for i in range(len(world.grid[5])):
+            world.grid[5][i].fill(np.cos(world.time/24*2*np.pi+i*np.pi/len(world.grid[5])))
+        world.grid[5] = np.transpose(world.grid[5])
+
+
+
 
 
     def get_grid(self):

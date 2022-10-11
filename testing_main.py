@@ -13,7 +13,7 @@ world = world(20)
 running = True
 clock = pygame.time.Clock()
 while running:
-    clock.tick(1)
+    clock.tick(3)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
