@@ -4,32 +4,34 @@ from random import randrange
 import numpy as np
 from perlin_noise import PerlinNoise
 
+
 class World:
     grid_depth = 10
     grid = None
     grid_size = None
     time = 0
-    def __init__(self,grid_size):
-        world.grid_size = grid_size
-        x_pix, y_pix = grid_size, grid_size
-        world.grid = np.full((world.grid_depth, x_pix, y_pix), None)
-        world.initialize_grass(self)
-        world.initialize_earth(self)
-        world.initialize_temp(self)
-        world.initialize_heigh(self)
-        world.initialize_water(self)
-        world.initialize_sun_intensity(self)
 
-    def step_time(self,step_size=1):
-        world.time = (world.time + step_size) % 24
+    def __init__(self, grid_size):
+        World.grid_size = grid_size
+        x_pix, y_pix = grid_size, grid_size
+        World.grid = np.full((World.grid_depth, x_pix, y_pix), None)
+        World.initialize_grass(self)
+        World.initialize_earth(self)
+        World.initialize_temp(self)
+        World.initialize_heigh(self)
+        World.initialize_water(self)
+        World.initialize_sun_intensity(self)
+
+    def step_time(self, step_size=1):
+        World.time = (World.time + step_size) % 24
 
     def initialize_grass(self):
         noise = PerlinNoise(octaves=5, seed=10)
-        x_pix, y_pix = world.grid_size, world.grid_size
+        x_pix, y_pix = World.grid_size, World.grid_size
         pic = [[noise([i / x_pix, j / y_pix]) for j in range(x_pix)] for i in range(y_pix)]
         for j in range(x_pix):
             for i in range(y_pix):
-                world.grid[0][j][i] = abs(pic[j][i])
+                World.grid[0][j][i] = abs(pic[j][i])
 
     def step_grass(self, step_size=0.005):
         World.grid[0] += World.grid[1] * step_size * 10
@@ -63,23 +65,22 @@ class World:
 
     def initialize_temp(self):
         noise = PerlinNoise(octaves=5, seed=10)
-        x_pix, y_pix = world.grid_size, world.grid_size
+        x_pix, y_pix = World.grid_size, World.grid_size
         pic = [[noise([i / x_pix, j / y_pix]) for j in range(x_pix)] for i in range(y_pix)]
         for j in range(x_pix):
             for i in range(y_pix):
-                world.grid[3][j][i] = abs(pic[j][i])
-
+                World.grid[3][j][i] = abs(pic[j][i])
 
     def get_temp(self, x, y):
         return self.grid[3][x][y]
 
     def initialize_heigh(self):
         noise = PerlinNoise(octaves=5, seed=10)
-        x_pix, y_pix = world.grid_size, world.grid_size
+        x_pix, y_pix = World.grid_size, World.grid_size
         pic = [[noise([i / x_pix, j / y_pix]) for j in range(x_pix)] for i in range(y_pix)]
         for j in range(x_pix):
             for i in range(y_pix):
-                world.grid[4][j][i] = abs(pic[j][i])
+                World.grid[4][j][i] = abs(pic[j][i])
 
     def get_height(self, x, y):
         return self.grid[4][x][y]
@@ -107,7 +108,7 @@ class World:
                     for neighbor in World.neighborPoints(self, i, j):
                         if World.grid[4][neighbor[0]][neighbor[1]] - World.grid[4][j][i] < 0:
                             World.grid[2][neighbor[0]][neighbor[1]] += 0.01 * (
-                                        1 - World.grid[2][neighbor[0]][neighbor[1]])
+                                    1 - World.grid[2][neighbor[0]][neighbor[1]])
                             World.grid[2][j][i] -= 0.01 * (1 - World.grid[2][neighbor[0]][neighbor[1]])
                             World.grid[2] = np.clip(World.grid[2], 0, 1)
 
@@ -123,23 +124,20 @@ class World:
     def step_sun(self):
         World.grid[5] = np.transpose(World.grid[5])
         for i in range(len(World.grid[5])):
-            World.grid[5][i].fill(np.cos(World.time/24*2*np.pi+i*np.pi/len(World.grid[5])))
+            World.grid[5][i].fill(np.cos(World.time / 24 * 2 * np.pi + i * np.pi / len(World.grid[5])))
         World.grid[5] = np.transpose(World.grid[5])
-
-
-
 
     def get_grid(self):
         return World.grid
 
     def neighborPoints(self, i, j):
         neighbors = np.zeros((8, 2), dtype=np.dtype('i2'))
-        neighbors[7] = [(i + 1) % world.grid_size, (j - 1) % world.grid_size]
-        neighbors[6] = [(i - 1) % world.grid_size, (j - 1) % world.grid_size]
-        neighbors[5] = [(i-1)%world.grid_size, (j+1)%world.grid_size]
-        neighbors[4] = [(i+1)%world.grid_size, (j+1)%world.grid_size]
-        neighbors[3] = [i, (j+1)%world.grid_size]
-        neighbors[1] = [i, (j-1)%world.grid_size]
-        neighbors[2] = [(i+1)%world.grid_size, j]
-        neighbors[0] = [(i-1)%world.grid_size, j]
+        neighbors[7] = [(i + 1) % World.grid_size, (j - 1) % World.grid_size]
+        neighbors[6] = [(i - 1) % World.grid_size, (j - 1) % World.grid_size]
+        neighbors[5] = [(i - 1) % World.grid_size, (j + 1) % World.grid_size]
+        neighbors[4] = [(i + 1) % World.grid_size, (j + 1) % World.grid_size]
+        neighbors[3] = [i, (j + 1) % World.grid_size]
+        neighbors[1] = [i, (j - 1) % World.grid_size]
+        neighbors[2] = [(i + 1) % World.grid_size, j]
+        neighbors[0] = [(i - 1) % World.grid_size, j]
         return neighbors

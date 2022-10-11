@@ -1,9 +1,9 @@
 import pygame
 import numpy as np
 from perlin_noise import perlin_noise
-from creature import Creature
+from world.creature import Creature
 from rendering import rendering
-from world import World
+from world.world import World
 
 
 pygame.init()

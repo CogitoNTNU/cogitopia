@@ -2,27 +2,27 @@ import pygame
 import numpy as np
 from random import randrange
 import random
-from world import World
+from world.world import World
 
-grid_size=20
-N,E,S,W=range(4)
+grid_size = 20
+N, E, S, W = range(4)
+
+
 class Creature:
-    EAT, TURN_L, TURN_R, WALK=range(4)
+    EAT, TURN_L, TURN_R, WALK = range(4)
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
         self.d = randrange(3)
 
     def turn(self):
-        turning = np.random.randint(0, 3)
-        if self.d == 1 and turning == 2:
-            self.d = W
-        elif self.d == 4 and turning == 1:
-            self.d = N
-        elif turning == 2:
-            self.d = self.d - 1 % 4
-        else:
-            self.d = self.d + turning % 4
+        LEFT, RIGHT, FORWARD = range(3)
+        turning = np.random.choice([LEFT, RIGHT, FORWARD])
+        if turning == RIGHT:
+            self.d = (self.d - 1) % 4
+        elif turning == LEFT:
+            self.d = (self.d + 1) % 4
 
     def walk(self):
         if self.d == N:
@@ -37,19 +37,19 @@ class Creature:
             self.x = self.x
             self.y = self.y
 
-    def vision(self,world):
-        grass=np.zeros(9)
-        grass[0]=world.get_grass(self.x-1,self.y-1)
-        grass[1]=world.get_grass(self.x,self.y-1)
-        grass[2]=world.get_grass(self.x+1,self.y-1)
-        grass[3]=world.get_grass(self.x-1,self.y)
-        grass[4]=world.get_grass(self.x,self.y)
-        grass[5]=world.get_grass(self.x+1,self.y)
-        grass[6]=world.get_grass(self.x-1,self.y+1)
-        grass[7]=world.get_grass(self.x,self.y+1)
-        grass[8]=world.get_grass(self.x+1,self.y+1)
-        grass=grass.reshape(3,3)
-        return(np.unravel_index(grass.argmax(),grass.shape))
+    def vision(self, world):
+        grass = np.zeros(9)
+        grass[0] = world.get_grass(self.x - 1, self.y - 1)
+        grass[1] = world.get_grass(self.x, self.y - 1)
+        grass[2] = world.get_grass(self.x + 1, self.y - 1)
+        grass[3] = world.get_grass(self.x - 1, self.y)
+        grass[4] = world.get_grass(self.x, self.y)
+        grass[5] = world.get_grass(self.x + 1, self.y)
+        grass[6] = world.get_grass(self.x - 1, self.y + 1)
+        grass[7] = world.get_grass(self.x, self.y + 1)
+        grass[8] = world.get_grass(self.x + 1, self.y + 1)
+        grass = grass.reshape(3, 3)
+        return (np.unravel_index(grass.argmax(), grass.shape))
 
-    def moveTowards(self,world):
-        max=self.vision(world)
+    def moveTowards(self, world):
+        max = self.vision(world)
