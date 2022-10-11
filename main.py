@@ -4,7 +4,7 @@ import numpy as np
 from numba import njit
 from perlin_noise import PerlinNoise
 from creature import Creature
-from renderng import rendering
+from rendering import rendering
 
 pygame.init()
 grid_size = 20
