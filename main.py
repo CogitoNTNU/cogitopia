@@ -6,6 +6,12 @@ from rendering import rendering
 from world import World
 
 
+pygame.init()
+grid_size = 20
+cell_size = 32
+screen = pygame.display.set_mode([grid_size * cell_size, grid_size * cell_size])
+
+
 def noise_func(size):
     noise = PerlinNoise(octaves=5, seed=10)
 
@@ -49,7 +55,7 @@ if __name__ == '__main__':
             rendering.draw_creature(c, screen)
             world.eat_grass(c.y, c.x)
             c.turn()
-            c.step()
+            c.walk()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
