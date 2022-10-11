@@ -2,6 +2,10 @@
 import numpy as np
 import pygame
 layer_dict = {'grass' : 0, 'earth' : 1, 'water' : 2 ,'player' : 10,'temperature':3,'heigh':4, 'sun':5}
+cell_size=32
+black = (0, 0, 0)
+white = (200, 200, 200)
+red=(255,0,0)
 
 class rendering:
     def draw_grass(grid,screen):
@@ -34,6 +38,23 @@ class rendering:
         for y in range(len(grid[0])):
             for x in range(len(grid[0][0])):
                 pygame.draw.rect(screen, (grid[layer_dict['sun']][y][x]*7,grid[layer_dict['sun']][y][x]*7,0), (50 * x, 50 * y, 50, 50))
+
+    def draw_creature(c, screen):
+        (N, W, S, E) = [0, 1, 2, 3]
+        rect = pygame.Rect(c.x * cell_size, c.y * cell_size, cell_size, cell_size)
+        pygame.draw.rect(screen, black, rect)
+        if c.d == S:
+            pygame.draw.line(screen, red, ((c.x * cell_size) + cell_size / 2, (c.y * cell_size) + cell_size / 2),
+                             ((c.x * cell_size) + cell_size / 2, (c.y * cell_size)), 3)
+        elif c.d == E:
+            pygame.draw.line(screen, red, ((c.x * cell_size) + cell_size / 2, (c.y * cell_size) + cell_size / 2),
+                             ((c.x * cell_size), (c.y * cell_size) + cell_size / 2), 3)
+        elif c.d == N:
+            pygame.draw.line(screen, red, ((c.x * cell_size) + cell_size / 2, (c.y * cell_size) + cell_size / 2),
+                             ((c.x * cell_size) + cell_size / 2, (c.y * cell_size) + cell_size), 3)
+        elif c.d == W:
+            pygame.draw.line(screen, red, ((c.x * cell_size) + cell_size / 2, (c.y * cell_size) + cell_size / 2),
+                             ((c.x * cell_size) + cell_size, (c.y * cell_size) + cell_size / 2), 3)
 
 
         
