@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 from random import randrange
 import random
-from world import World
+from world import world
 
 grid_size=20
 (N,W,S,E)=[0,1,2,3]
@@ -13,7 +13,7 @@ class Creature:
         self.d=randrange(3)
 
 
-    def turn(self,vison):
+    def turn(self,vision):
         turning = np.random.randint(0,3)
         if self.d == 1 and turning == 2:
             self.d = W
