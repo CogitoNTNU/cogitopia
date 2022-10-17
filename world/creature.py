@@ -1,11 +1,9 @@
-import pygame
-import numpy as np
 from random import randrange
-import random
-from world.world import World
 
-grid_size = 20
+import numpy as np
+
 N, E, S, W = range(4)
+LEFT, RIGHT, FORWARD = range(3)
 
 
 class Creature:
@@ -15,9 +13,9 @@ class Creature:
         self.x = x
         self.y = y
         self.d = randrange(3)
+        self.grid_size = 20
 
     def turn(self):
-        LEFT, RIGHT, FORWARD = range(3)
         turning = np.random.choice([LEFT, RIGHT, FORWARD])
         if turning == RIGHT:
             self.d = (self.d - 1) % 4
@@ -26,13 +24,13 @@ class Creature:
 
     def walk(self):
         if self.d == N:
-            self.y = (self.y + 1) % grid_size
+            self.y = (self.y + 1) % self.grid_size
         elif self.d == S:
-            self.y = (self.y - 1) % grid_size
+            self.y = (self.y - 1) % self.grid_size
         elif self.d == E:
-            self.x = (self.x - 1) % grid_size
+            self.x = (self.x - 1) % self.grid_size
         elif self.d == W:
-            self.x = (self.x + 1) % grid_size
+            self.x = (self.x + 1) % self.grid_size
         elif self.d == 0:
             self.x = self.x
             self.y = self.y
@@ -49,7 +47,10 @@ class Creature:
         grass[7] = world.get_grass(self.x, self.y + 1)
         grass[8] = world.get_grass(self.x + 1, self.y + 1)
         grass = grass.reshape(3, 3)
-        return (np.unravel_index(grass.argmax(), grass.shape))
+        return np.unravel_index(grass.argmax(), grass.shape)
 
-    def moveTowards(self, world):
+
+'''
+    def move_towards(self, world):
         max = self.vision(world)
+'''

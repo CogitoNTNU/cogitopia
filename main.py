@@ -1,36 +1,37 @@
 import pygame
-import numpy as np
-from perlin_noise import perlin_noise
+
 from world.creature import Creature
-from rendering import Renderer
 from world.world import World
 
 pygame.init()
 grid_size = 20
-scale = 16
+scale = 32
 screen = pygame.display.set_mode([grid_size * scale, grid_size * scale])
 
 if __name__ == '__main__':
-    renderer = Renderer(None, scale)
     pygame.init()
-    screen = pygame.display.set_mode([grid_size * scale, grid_size * scale])
-    world = World(grid_size)
-    creatures = [Creature(5, 5), Creature(7, 5), Creature(5, 10)]
     clock = pygame.time.Clock()
+
+    world = World(grid_size, scale)
+    world.add_creature(Creature(5, 5))
+    world.add_creature(Creature(7, 5))
+    world.add_creature(Creature(5, 10))
+
     running = True
     while running:
         screen.fill((0, 100, 0))
-        renderer.draw_grass(world.get_grid(), screen)
-        for c in creatures:
-            renderer.draw_creature(c, screen)
-            world.eat_grass(c.y, c.x)
+        world.draw_world()
+        world.update()
+
+        for c in world.creatures:
             c.turn()
             c.walk()
+            world.grass.eat_grass(c.x, c.y)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        
-        world.step_grass()
+
         pygame.display.flip()
-        clock.tick(0)
+        clock.tick(9)
     pygame.quit()
