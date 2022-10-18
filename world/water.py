@@ -5,10 +5,13 @@ from .layer import Layer
 
 class Water(Layer):
 
-    def __init__(self, size):
+    def __init__(self, size, height_layer):
         initial = np.zeros((size, size))
-        initial[2][2] = 1
-        initial[1][0] = 1
+        for i in range(size):
+            for j in range(size):
+                height = height_layer.get_value(i, j)
+                if height < 0.05:
+                    initial[i][j] = 0.05 - height
         Layer.__init__(self, size, initial)
 
     def step_water(self, height):

@@ -18,8 +18,8 @@ class World:
         self.grass = Grass(self.size, self.initialize())
         self.earth = Earth(self.size, self.initialize())
         self.temperature = Temperature(self.size, self.initialize())
-        self.height = Height(self.size, self.initialize())
-        self.water = Water(self.size)
+        self.height = Height(self.size, self.initialize(1))
+        self.water = Water(self.size, self.height)
         self.sun = Sun(self.size)
         self.renderer = Renderer(self.size, self.scale)
         self.creatures = []
@@ -30,7 +30,7 @@ class World:
     def update(self):
         self.grass.step(self.earth.get_layer())
         self.earth.step()
-        self.sun.step(self.time)
+        # self.sun.step(self.time)
         # self.temperature.step()
         self.inc_time()
 
@@ -39,14 +39,14 @@ class World:
         # self.renderer.draw_layer(self.earth)
         # self.renderer.draw_layer(self.temperature)
         # self.renderer.draw_layer(self.height)
-        # self.renderer.draw_layer(self.water)
+        self.renderer.draw_layer(self.water)
         # self.renderer.draw_layer(self.sun)
 
         for c in self.creatures:
             self.renderer.draw_creature(c)
 
-    def initialize(self):
-        noise = PerlinNoise(octaves=5, seed=randint(1, 20))
+    def initialize(self, octaves=5):
+        noise = PerlinNoise(octaves=octaves, seed=randint(1, 20))
         pic = [[abs(noise([i / self.size, j / self.size])) for j in range(self.size)] for i in range(self.size)]
         return pic
 
