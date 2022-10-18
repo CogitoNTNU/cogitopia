@@ -1,10 +1,9 @@
-import pygame
-import numpy as np
 from random import randrange
-import random
 
-grid_size = 20
+import numpy as np
+
 N, E, S, W = range(4)
+LEFT, RIGHT, FORWARD = range(3)
 
 
 class Creature:
@@ -14,6 +13,7 @@ class Creature:
         self.x = x
         self.y = y
         self.d = randrange(3)
+        self.grid_size = world.size
         self.action_buffer = None
         self.world = world
 
@@ -22,11 +22,11 @@ class Creature:
 
     def process_action(self):
         if self.action_buffer == Creature.EAT:
-            self.world.eat_grass(self.y, self.x)
+            self.world.grass.eat_grass(self.y, self.x)
         if self.action_buffer == Creature.TURN_L:
-            self.turn(0)
-        if self.action_buffer == Creature.TURN_R:
             self.turn(1)
+        if self.action_buffer == Creature.TURN_R:
+            self.turn(0)
         if self.action_buffer == Creature.WALK:
             self.walk()
 
@@ -38,13 +38,13 @@ class Creature:
 
     def walk(self):
         if self.d == N:
-            self.y = (self.y + 1) % grid_size
+            self.y = (self.y + 1) % self.grid_size
         elif self.d == S:
-            self.y = (self.y - 1) % grid_size
+            self.y = (self.y - 1) % self.grid_size
         elif self.d == E:
-            self.x = (self.x - 1) % grid_size
+            self.x = (self.x - 1) % self.grid_size
         elif self.d == W:
-            self.x = (self.x + 1) % grid_size
+            self.x = (self.x + 1) % self.grid_size
         elif self.d == 0:
             self.x = self.x
             self.y = self.y
@@ -61,7 +61,10 @@ class Creature:
         grass[7] = world.get_grass(self.x, self.y + 1)
         grass[8] = world.get_grass(self.x + 1, self.y + 1)
         grass = grass.reshape(3, 3)
-        return (np.unravel_index(grass.argmax(), grass.shape))
+        return np.unravel_index(grass.argmax(), grass.shape)
 
-    def moveTowards(self, world):
+
+'''
+    def move_towards(self, world):
         max = self.vision(world)
+'''
