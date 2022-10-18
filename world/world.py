@@ -3,6 +3,7 @@ from numpy import random
 from random import randrange
 import numpy as np
 from perlin_noise import PerlinNoise
+from .creature import Creature
 
 # WorldSettings should have all constants that
 # are related to the simulation (not rendering)
@@ -30,7 +31,15 @@ class World:
         World.initialize_heigh(self)
         World.initialize_water(self)
         World.initialize_sun_intensity(self)
-
+        self.creatures = [Creature(5, 5), Creature(7, 5), Creature(5, 10)]
+    
+    def step(self):
+        for c in self.creatures:
+            self.eat_grass(c.y, c.x)
+            c.turn()
+            c.walk()
+        self.step_grass()
+        
     def step_time(self, step_size=1):
         World.time = (World.time + step_size) % 24
 

@@ -2,7 +2,6 @@ import pygame
 import numpy as np
 from random import randrange
 import random
-from world.world import World
 
 grid_size = 20
 N, E, S, W = range(4)
