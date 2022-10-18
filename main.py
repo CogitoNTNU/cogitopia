@@ -6,10 +6,13 @@ from world.world import World, WorldSettings
 from agent import Agent
 
 # Grid size is the number of cells in the world
-grid_size = 20 
+grid_size = 20
 
 # Scale is the pixel size of each world cell on screen
 scale = 16
+
+# Framerate is the time between each tick
+framerate = 0
 
 pygame.init()
 screen = pygame.display.set_mode([grid_size * scale, grid_size * scale])
@@ -49,6 +52,6 @@ if __name__ == '__main__':
         screen.fill((0, 0, 0))
         renderer.draw_world()
         pygame.display.flip()
-        clock.tick(0)
+        clock.tick(framerate)
 
     pygame.quit()
