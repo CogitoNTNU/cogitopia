@@ -1,66 +1,54 @@
 import pygame
 import numpy as np
 from perlin_noise import perlin_noise
-from world.creature import Creature
-from rendering import rendering
-from world.world import World
+from rendering import Renderer
+from world.world import World, WorldSettings
+from agent import Agent
 
+# Grid size is the number of cells in the world
+grid_size = 20 
+
+# Scale is the pixel size of each world cell on screen
+scale = 16
 
 pygame.init()
-grid_size = 20
-cell_size = 32
-screen = pygame.display.set_mode([grid_size * cell_size, grid_size * cell_size])
-
-
-def noise_func(size):
-    noise = perlin_noise(octaves=5, seed=10)
-
-    x_cells, y_cells = size, size
-    grid = np.zeros((2, x_cells, y_cells))
-    pic = [[noise([i / x_cells, j / y_cells]) for j in range(x_cells)] for i in range(y_cells)]
-
-    for j in range(x_cells):
-        for i in range(y_cells):
-            grid[0][j][i] = abs(pic[j][i]) * 180 + 75
-
-    return grid
-
-
-def draw_grid(grid):
-    for layer in range(len(grid)):
-        for y in range(len(grid[0])):
-            for x in range(len(grid[0][0])):
-                if grid[layer][y, x] != 0 and layer == 0:
-                    pygame.draw.rect(screen, (0, grid[layer][y][x], 0),
-                                     (cell_size * x, cell_size * y, cell_size, cell_size))
-                elif grid[layer][y, x] != 0 and layer == 1:
-                    pygame.draw.circle(screen, (grid[layer][y][x], 0, 0),
-                                       (cell_size * x - cell_size / 2, cell_size * y + cell_size / 2), cell_size / 2)
-    return grid
-
+screen = pygame.display.set_mode([grid_size * scale, grid_size * scale])
 
 if __name__ == '__main__':
     pygame.init()
-    grid_size = 20
-    cell_size = 50
-    screen = pygame.display.set_mode([grid_size * cell_size, grid_size * cell_size])
-    world = World(grid_size)
-    creatures = [Creature(5, 5), Creature(7, 5), Creature(5, 10)]
+    screen = pygame.display.set_mode([grid_size * scale, grid_size * scale])
     clock = pygame.time.Clock()
+    
+    # World setup
+    ws = WorldSettings()
+    ws.grass_growth_rate = 5 # Example use of ws
+    
+    world = World(grid_size, ws)
+    renderer = Renderer(world, scale, screen)
+    agents = []
+    for i in range(5):
+        c = world.spawn_creature(5, 5)
+        agents.append(Agent(world, c))
+
     running = True
+    
     while running:
-        screen.fill((0, 100, 0))
-        rendering.draw_grass(world.get_grid(), screen)
-        for c in creatures:
-            rendering.draw_creature(c, screen)
-            world.eat_grass(c.y, c.x)
-            c.turn()
-            c.walk()
+        # Process input
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        world.step_grass()
+        
+        # Step agents
+        for agent in agents:
+            agent.step()
+
+        # Step world
+        world.step()
+        
+        # Render everything and display
+        screen.fill((0, 0, 0))
+        renderer.draw_world()
         pygame.display.flip()
-        clock.tick(1)
+        clock.tick(0)
 
     pygame.quit()
