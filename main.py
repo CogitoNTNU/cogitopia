@@ -3,7 +3,7 @@ import numpy as np
 from perlin_noise import perlin_noise
 from world.creature import Creature
 from rendering import Renderer
-from world.world import World
+from world.world import World, WorldSettings
 
 pygame.init()
 grid_size = 20
@@ -14,7 +14,11 @@ if __name__ == '__main__':
     renderer = Renderer(None, scale)
     pygame.init()
     screen = pygame.display.set_mode([grid_size * scale, grid_size * scale])
-    world = World(grid_size)
+    
+    ws = WorldSettings()
+    ws.grass_growth_rate = 5
+    world = World(grid_size, ws)
+    
     creatures = [Creature(5, 5), Creature(7, 5), Creature(5, 10)]
     clock = pygame.time.Clock()
     running = True

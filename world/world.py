@@ -4,14 +4,17 @@ from random import randrange
 import numpy as np
 from perlin_noise import PerlinNoise
 
+class WorldSettings:
+    grass_growth_rate = 10
 
 class World:
     grid_depth = 10
     grid = None
-    grid_size = None
+    grid_size = 8
     time = 0
 
-    def __init__(self, grid_size):
+    def __init__(self, grid_size, world_settings):
+        self.ws = world_settings
         World.grid_size = grid_size
         x_pix, y_pix = grid_size, grid_size
         World.grid = np.full((World.grid_depth, x_pix, y_pix), None)
@@ -34,7 +37,7 @@ class World:
                 World.grid[0][j][i] = abs(pic[j][i])
 
     def step_grass(self, step_size=0.005):
-        World.grid[0] += World.grid[1] * step_size * 10
+        World.grid[0] += World.grid[1] * step_size * self.ws.grass_growth_rate
         # World.grid[0]*=(1-abs(World.grid[0]-World.grid[1]))
         World.grid[0] = np.clip(World.grid[0], 0, 1)
         World.step_earth(self)
