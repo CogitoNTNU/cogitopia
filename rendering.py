@@ -6,10 +6,17 @@ red = (255, 0, 0)
 
 
 class Renderer:
-    def __init__(self, size, scale):
+    def __init__(self, world, scale, screen):
         self.scale = scale
-        self.size = size
-        self.screen = pygame.display.set_mode((size * scale, size * scale))
+        self.world = world
+        self.screen = screen
+        self.size = world.size
+
+    def draw_world(self):
+        self.draw_layer(self.world.grass)        
+        self.draw_layer(self.world.water)
+        for c in self.world.creatures:
+            self.draw_creature(c)
 
     def draw_layer(self, layer):
         for x in range(self.size):

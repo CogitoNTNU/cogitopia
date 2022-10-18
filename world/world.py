@@ -10,20 +10,20 @@ from .temperature import Temperature
 from .height import Height
 from .water import Water
 from .sun import Sun
+from .creature import Creature
 from rendering import Renderer
 
 
 class WorldSettings:
     grass_growth_rate = 10
 
-
 # Variables that change during simulation, such
 # as time, belongs in the World class
 
 class World:
-    def __init__(self, size, scale):
+    def __init__(self, size, ws):
+        self.ws = ws
         self.time = 0
-        self.scale = scale
         self.size = size
         self.grass = Grass(self.size, self.initialize())
         self.earth = Earth(self.size, self.initialize())
@@ -31,29 +31,19 @@ class World:
         self.height = Height(self.size, self.initialize(1))
         self.water = Water(self.size, self.height)
         self.sun = Sun(self.size)
-        self.renderer = Renderer(self.size, self.scale)
         self.creatures = []
 
-    def add_creature(self, creature):
+    def spawn_creature(self, x, y):
+        creature = Creature(x, y, self)
         self.creatures.append(creature)
+        return creature
 
-    def update(self):
+    def step(self):
+        for c in self.creatures:
+            c.process_action()
         self.grass.step(self.earth.get_layer())
         self.earth.step()
-        # self.sun.step(self.time)
-        # self.temperature.step()
         self.inc_time()
-
-    def draw_world(self):
-        self.renderer.draw_layer(self.grass)
-        # self.renderer.draw_layer(self.earth)
-        # self.renderer.draw_layer(self.temperature)
-        # self.renderer.draw_layer(self.height)
-        self.renderer.draw_layer(self.water)
-        # self.renderer.draw_layer(self.sun)
-
-        for c in self.creatures:
-            self.renderer.draw_creature(c)
 
     def initialize(self, octaves=5):
         noise = PerlinNoise(octaves=octaves, seed=randint(1, 20))

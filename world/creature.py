@@ -9,11 +9,11 @@ LEFT, RIGHT, FORWARD = range(3)
 class Creature:
     EAT, TURN_L, TURN_R, WALK = range(4)
 
-    def __init__(self, x, y, size, world):
+    def __init__(self, x, y, world):
         self.x = x
         self.y = y
         self.d = randrange(3)
-        self.grid_size = size
+        self.grid_size = world.size
         self.action_buffer = None
         self.world = world
 
@@ -24,9 +24,9 @@ class Creature:
         if self.action_buffer == Creature.EAT:
             self.world.grass.eat_grass(self.y, self.x)
         if self.action_buffer == Creature.TURN_L:
-            self.turn(0)
-        if self.action_buffer == Creature.TURN_R:
             self.turn(1)
+        if self.action_buffer == Creature.TURN_R:
+            self.turn(0)
         if self.action_buffer == Creature.WALK:
             self.walk()
 
