@@ -4,18 +4,18 @@ from world.creature import Creature
 from world.world import World
 
 pygame.init()
-grid_size = 20
-scale = 32
-screen = pygame.display.set_mode([grid_size * scale, grid_size * scale])
+size = 30
+scale = 16
+screen = pygame.display.set_mode([size * scale, size * scale])
 
 if __name__ == '__main__':
     pygame.init()
     clock = pygame.time.Clock()
 
-    world = World(grid_size, scale)
-    world.add_creature(Creature(5, 5))
-    world.add_creature(Creature(7, 5))
-    world.add_creature(Creature(5, 10))
+    world = World(size, scale)
+    world.add_creature(Creature(5, 5, size))
+    world.add_creature(Creature(7, 5, size))
+    world.add_creature(Creature(5, 10, size))
 
     running = True
     while running:
@@ -33,5 +33,5 @@ if __name__ == '__main__':
                 running = False
 
         pygame.display.flip()
-        clock.tick(9)
+        clock.tick(0)
     pygame.quit()

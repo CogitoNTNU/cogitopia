@@ -9,11 +9,11 @@ LEFT, RIGHT, FORWARD = range(3)
 class Creature:
     EAT, TURN_L, TURN_R, WALK = range(4)
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, size):
         self.x = x
         self.y = y
         self.d = randrange(3)
-        self.grid_size = 20
+        self.grid_size = size
 
     def turn(self):
         turning = np.random.choice([LEFT, RIGHT, FORWARD])
