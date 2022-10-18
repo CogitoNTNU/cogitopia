@@ -3,7 +3,7 @@ from world.world import World, WorldSettings
 from world.creature import Creature
 
 Creature.EAT()  
-Creature.
+
 
 grid_size = 20 
 ws = WorldSettings()
@@ -13,5 +13,5 @@ world = World(grid_size, ws)
 c = world.spawn_creature(5, 5)
 
 
-def train_brain(self,,config):
-
+def train_brain(self,c,config):
+    print("Training brain")
