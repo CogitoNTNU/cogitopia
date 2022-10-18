@@ -24,16 +24,16 @@ class Creature:
         if self.action_buffer == Creature.EAT:
             self.world.eat_grass(self.y, self.x)
         if self.action_buffer == Creature.TURN_L:
-            self.turn()
+            self.turn(0)
+        if self.action_buffer == Creature.TURN_R:
+            self.turn(1)
         if self.action_buffer == Creature.WALK:
             self.walk()
 
-    def turn(self):
-        LEFT, RIGHT, FORWARD = range(3)
-        turning = np.random.choice([LEFT, RIGHT, FORWARD])
-        if turning == RIGHT:
+    def turn(self, direction): # direction 0 = right, 1 = left
+        if direction == 0:
             self.d = (self.d - 1) % 4
-        elif turning == LEFT:
+        if direction == 1:
             self.d = (self.d + 1) % 4
 
     def walk(self):
