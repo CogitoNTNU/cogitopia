@@ -9,8 +9,7 @@ LEFT, RIGHT, FORWARD = range(3)
 class Creature:
     EAT, TURN_L, TURN_R, WALK = range(4)
 
-    def __init__(self, x, y, size):
-    def __init__(self, x, y, world):
+    def __init__(self, x, y, size, world):
         self.x = x
         self.y = y
         self.d = randrange(3)
@@ -23,7 +22,7 @@ class Creature:
 
     def process_action(self):
         if self.action_buffer == Creature.EAT:
-            self.world.eat_grass(self.y, self.x)
+            self.world.grass.eat_grass(self.y, self.x)
         if self.action_buffer == Creature.TURN_L:
             self.turn()
         if self.action_buffer == Creature.WALK:

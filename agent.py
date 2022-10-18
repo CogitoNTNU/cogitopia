@@ -1,6 +1,7 @@
 from world.creature import Creature
 import numpy as np
 
+
 class Agent:
     def __init__(self, world, creature):
         self.world = world
