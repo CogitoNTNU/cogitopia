@@ -18,4 +18,4 @@ class Grass(Layer):
 
     @staticmethod
     def get_color(value):
-        return 0, 180 * value + 75, 0
+        return 0, 150 * value + 45, 0

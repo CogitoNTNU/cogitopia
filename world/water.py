@@ -27,4 +27,4 @@ class Water(Layer):
 
     @staticmethod
     def get_color(value):
-        return 0, 0, value * 50 + 50
+        return 0, 0, value * 2000 + 50
