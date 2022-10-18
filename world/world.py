@@ -4,8 +4,14 @@ from random import randrange
 import numpy as np
 from perlin_noise import PerlinNoise
 
+# WorldSettings should have all constants that
+# are related to the simulation (not rendering)
+
 class WorldSettings:
     grass_growth_rate = 10
+
+# Variables that change during simulation, such
+# as time, belongs in the World class
 
 class World:
     grid_depth = 10
