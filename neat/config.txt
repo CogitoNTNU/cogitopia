@@ -6,11 +6,21 @@ fitness_threshold     = 30
 pop_size              = 50
 reset_on_extinction   = False
 
+[DefaultStagnation]
+species_fitness_func = max
+max_stagnation       = 20
+species_elitism      = 2
+
+[DefaultReproduction]
+elitism            = 2
+survival_threshold = 0.2
+
 [DefaultGenome]
 # node activation options
 activation_default      = sigmoid
 activation_mutate_rate  = 0.0
 activation_options      = sigmoid
+
 
 # node aggregation options
 aggregation_default     = sum
@@ -70,12 +80,3 @@ weight_replace_rate     = 0.1
 
 [DefaultSpeciesSet]
 compatibility_threshold = 3.0
-
-[DefaultStagnation]
-species_fitness_func = max
-max_stagnation       = 20
-species_elitism      = 2
-
-[DefaultReproduction]
-elitism            = 2
-survival_threshold = 0.2
