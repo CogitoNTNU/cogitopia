@@ -31,13 +31,16 @@ class World:
         World.initialize_heigh(self)
         World.initialize_water(self)
         World.initialize_sun_intensity(self)
-        self.creatures = [Creature(5, 5), Creature(7, 5), Creature(5, 10)]
+        self.creatures = []
     
+    def spawn_creature(self, x, y):
+        new_c = Creature(x, y, self)
+        self.creatures.append(new_c)
+        return new_c
+
     def step(self):
         for c in self.creatures:
-            self.eat_grass(c.y, c.x)
-            c.turn()
-            c.walk()
+            c.process_action()
         self.step_grass()
         
     def step_time(self, step_size=1):

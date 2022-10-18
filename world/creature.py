@@ -10,10 +10,23 @@ N, E, S, W = range(4)
 class Creature:
     EAT, TURN_L, TURN_R, WALK = range(4)
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, world):
         self.x = x
         self.y = y
         self.d = randrange(3)
+        self.action_buffer = None
+        self.world = world
+
+    def request_action(self, action):
+        self.action_buffer = action
+
+    def process_action(self):
+        if self.action_buffer == Creature.EAT:
+            self.world.eat_grass(self.y, self.x)
+        if self.action_buffer == Creature.TURN_L:
+            self.turn()
+        if self.action_buffer == Creature.WALK:
+            self.walk()
 
     def turn(self):
         LEFT, RIGHT, FORWARD = range(3)
