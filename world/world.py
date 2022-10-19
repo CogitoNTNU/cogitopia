@@ -25,12 +25,12 @@ class World:
         self.ws = ws
         self.time = 0
         self.size = size
-        self.grass = Grass(self.size, self.initialize())
-        self.earth = Earth(self.size, self.initialize())
-        self.temperature = Temperature(self.size, self.initialize())
-        self.height = Height(self.size, self.initialize(1))
-        self.water = Water(self.size, self.height)
-        self.sun = Sun(self.size)
+        self.grass = Grass(self.size, self.initialize(), self)
+        self.earth = Earth(self.size, self.initialize(), self)
+        self.temperature = Temperature(self.size, self.initialize(), self)
+        self.height = Height(self.size, self.initialize(1), self)
+        self.water = Water(self.size, self.height, self)
+        self.sun = Sun(self.size, self)
         self.creatures = []
 
     def spawn_creature(self, x, y):
@@ -41,7 +41,8 @@ class World:
     def step(self):
         for c in self.creatures:
             c.process_action()
-        self.grass.step(self.earth.get_layer())
+
+        self.grass.step()
         self.earth.step()
         self.sun.step(self.time)
         self.inc_time()
@@ -56,3 +57,9 @@ class World:
 
     def inc_time(self):
         self.time += 1
+
+    @staticmethod
+    def is_dead(creature):
+        if creature.get_food() <= 0:
+            print("Creature starved to death")
+            return True

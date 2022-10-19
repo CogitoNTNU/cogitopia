@@ -4,9 +4,9 @@ from .layer import Layer
 
 
 class Sun(Layer):
-    def __init__(self, size):
+    def __init__(self, size, world):
         initial = np.zeros((size, size))
-        Layer.__init__(self, size, initial)
+        Layer.__init__(self, size, initial, world)
 
     def step(self, time):
         for i in range(len(self.grid)):

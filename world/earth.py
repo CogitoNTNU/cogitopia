@@ -4,8 +4,8 @@ from world.layer import Layer
 
 
 class Earth(Layer):
-    def __init__(self, size, initial):
-        Layer.__init__(self, size, initial)
+    def __init__(self, size, initial, world):
+        Layer.__init__(self, size, initial, world)
 
     def step(self):
         self.grid *= (1 - self.grid * 0.005)

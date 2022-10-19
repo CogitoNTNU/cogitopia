@@ -2,9 +2,10 @@ import numpy as np
 
 
 class Layer:
-    def __init__(self, size, initial):
+    def __init__(self, size, initial, world):
         self.size = size
         self.grid = np.array(initial)
+        self.world = world
 
     def get_layer(self):
         return self.grid

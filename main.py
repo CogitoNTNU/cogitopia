@@ -45,7 +45,9 @@ if __name__ == '__main__':
         # Step agents
         for agent in agents:
             agent.step()
-
+            if agent.world.is_dead(agent.creature):
+                agents.remove(agent)
+                world.creatures.remove(agent.creature)
         # Step world
         world.step()
 
@@ -53,6 +55,6 @@ if __name__ == '__main__':
         screen.fill((0, 0, 0))
         renderer.draw_world()
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(5)
 
     pygame.quit()

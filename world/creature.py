@@ -7,37 +7,49 @@ N, E, S, W = range(4)
 
 class Creature:
     EAT, TURN_L, TURN_R, WALK = range(4)
+    RIGHT, LEFT = range(2)
 
     def __init__(self, x, y, world):
         self.x = x
         self.y = y
-        self.d = randrange(5)
+        self.d = randrange(4)
         self.grid_size = world.size
         self.action_buffer = None
         self.world = world
+        self.food = 1
 
     def request_action(self, action):
         self.action_buffer = action
+
         if self.action_buffer == Creature.WALK:
             x1, y1 = self.front()
             if self.world.water.get_value(x1, y1) > 0:
                 return False
+
+        if self.action_buffer == Creature.EAT:
+            if self.world.grass.get_value(self.x, self.y) < 0.05:
+                return False
+
         return True
 
     def process_action(self):
         if self.action_buffer == Creature.EAT:
-            self.world.grass.eat_grass(self.x, self.y)
+            amount = self.world.grass.eat_grass(self.x, self.y)
+            self.food += amount
+            self.food = np.clip(self.food, -1, 1)
         if self.action_buffer == Creature.TURN_L:
-            self.turn(1)
+            self.turn(Creature.LEFT)
         if self.action_buffer == Creature.TURN_R:
-            self.turn(0)
+            self.turn(Creature.RIGHT)
         if self.action_buffer == Creature.WALK:
             self.walk()
 
+        self.food -= 0.02
+
     def turn(self, direction):  # direction 0 = right, 1 = left
-        if direction == 0:
+        if direction == Creature.RIGHT:
             self.d = (self.d + 1) % 4
-        if direction == 1:
+        if direction == Creature.LEFT:
             self.d = (self.d - 1) % 4
 
     def walk(self):
@@ -73,3 +85,6 @@ class Creature:
             return (self.x + 1) % self.grid_size, self.y
         else:
             return (self.x - 1) % self.grid_size, self.y
+
+    def get_food(self):
+        return self.food

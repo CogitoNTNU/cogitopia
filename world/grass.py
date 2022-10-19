@@ -4,11 +4,11 @@ from .layer import Layer
 
 
 class Grass(Layer):
-    def __init__(self, size, initial):
-        Layer.__init__(self, size, initial)
+    def __init__(self, size, initial, world):
+        Layer.__init__(self, size, initial, world)
 
-    def step(self, growth_factor):
-        self.grid += growth_factor * 0.005 * 1
+    def step(self):
+        self.grid += self.world.earth.get_layer() * 0.005 * 0.2
         self.grid = np.clip(self.grid, 0, 1)
 
     def eat_grass(self, x, y):

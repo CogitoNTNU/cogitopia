@@ -4,8 +4,8 @@ from .layer import Layer
 
 
 class Temperature(Layer):
-    def __init__(self, size, initial):
-        Layer.__init__(self, size, initial)
+    def __init__(self, size, initial, world):
+        Layer.__init__(self, size, initial, world)
 
     def step(self):
         for j in range(self.size):
