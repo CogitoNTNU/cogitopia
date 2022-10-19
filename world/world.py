@@ -1,9 +1,6 @@
 from random import randint
 from perlin_noise import PerlinNoise
 
-# WorldSettings should have all constants that
-# are related to the simulation (not rendering)
-
 from .earth import Earth
 from .grass import Grass
 from .temperature import Temperature
@@ -11,11 +8,14 @@ from .height import Height
 from .water import Water
 from .sun import Sun
 from .creature import Creature
-from rendering import Renderer
+
+# WorldSettings should have all constants that
+# are related to the simulation (not rendering)
 
 
 class WorldSettings:
     grass_growth_rate = 10
+
 
 # Variables that change during simulation, such
 # as time, belongs in the World class
@@ -43,6 +43,7 @@ class World:
             c.process_action()
         self.grass.step(self.earth.get_layer())
         self.earth.step()
+        self.sun.step(self.time)
         self.inc_time()
 
     def initialize(self, octaves=5):

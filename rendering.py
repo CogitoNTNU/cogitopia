@@ -13,8 +13,9 @@ class Renderer:
         self.size = world.size
 
     def draw_world(self):
-        self.draw_layer(self.world.grass)        
+        self.draw_layer(self.world.grass)
         self.draw_layer(self.world.water)
+        # self.draw_layer(self.world.sun)
         for c in self.world.creatures:
             self.draw_creature(c)
 
@@ -33,7 +34,7 @@ class Renderer:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale)), 3)
-        elif c.d == E:
+        elif c.d == W:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),
                              ((c.x * self.scale), (c.y * self.scale) + self.scale / 2), 3)
@@ -41,7 +42,7 @@ class Renderer:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale), 3)
-        elif c.d == W:
+        elif c.d == E:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),
                              ((c.x * self.scale) + self.scale, (c.y * self.scale) + self.scale / 2), 3)

@@ -8,5 +8,7 @@ class Agent:
         self.creature = creature
 
     def step(self):
-        action = np.random.choice([Creature.EAT, Creature.TURN_L, Creature.WALK])
-        self.creature.request_action(action)
+        valid = False
+        while not valid:
+            action = np.random.choice([Creature.EAT, Creature.TURN_L, Creature.TURN_R, Creature.WALK])
+            valid = self.creature.request_action(action)
