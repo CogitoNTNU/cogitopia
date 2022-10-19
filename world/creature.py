@@ -22,7 +22,7 @@ class Creature:
 
     def process_action(self):
         if self.action_buffer == Creature.EAT:
-            self.world.grass.eat_grass(self.y, self.x)
+            self.world.grass.eat_grass(self.x, self.y)
         if self.action_buffer == Creature.TURN_L:
             self.turn(1)
         if self.action_buffer == Creature.TURN_R:
@@ -32,9 +32,9 @@ class Creature:
 
     def turn(self, direction): # direction 0 = right, 1 = left
         if direction == 0:
-            self.d = (self.d - 1) % 4
-        if direction == 1:
             self.d = (self.d + 1) % 4
+        if direction == 1:
+            self.d = (self.d - 1) % 4
 
     def walk(self):
         if self.d == N:
@@ -42,9 +42,9 @@ class Creature:
         elif self.d == S:
             self.y = (self.y - 1) % self.grid_size
         elif self.d == E:
-            self.x = (self.x - 1) % self.grid_size
-        elif self.d == W:
             self.x = (self.x + 1) % self.grid_size
+        elif self.d == W:
+            self.x = (self.x - 1) % self.grid_size
         elif self.d == 0:
             self.x = self.x
             self.y = self.y
