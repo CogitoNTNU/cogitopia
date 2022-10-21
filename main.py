@@ -3,6 +3,7 @@ import random
 import pygame
 
 from agent import Agent
+from t_agent import TAgent
 from rendering import Renderer
 from world.world import World, WorldSettings
 
@@ -31,8 +32,15 @@ if __name__ == '__main__':
         x = random.randrange(grid_size)
         y = random.randrange(grid_size)
         if world.water.get_value(x, y) == 0:
-            c = world.spawn_creature(x, y)
+            c = world.spawn_creature(x, y, (0, 0, 0))
             agents.append(Agent(world, c))
+
+    # while len(agents) < 9:
+    #     x = random.randrange(grid_size)
+    #     y = random.randrange(grid_size)
+    #     if world.water.get_value(x, y) == 0:
+    #         c = world.spawn_creature(x, y, (50, 50, 50))
+    #         agents.append(TAgent(world, c))
 
     running = True
 
@@ -44,10 +52,10 @@ if __name__ == '__main__':
 
         # Step agents
         for agent in agents:
-            agent.step()
             if agent.world.is_dead(agent.creature):
                 agents.remove(agent)
                 world.creatures.remove(agent.creature)
+            agent.step()
         # Step world
         world.step()
 
@@ -55,6 +63,6 @@ if __name__ == '__main__':
         screen.fill((0, 0, 0))
         renderer.draw_world()
         pygame.display.flip()
-        clock.tick(5)
+        clock.tick(20)
 
     pygame.quit()

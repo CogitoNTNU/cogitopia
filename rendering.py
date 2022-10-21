@@ -29,7 +29,7 @@ class Renderer:
     def draw_creature(self, c):
         (N, E, S, W) = [0, 1, 2, 3]
         rect = pygame.Rect(c.x * self.scale, c.y * self.scale, self.scale, self.scale)
-        pygame.draw.rect(self.screen, black, rect)
+        pygame.draw.rect(self.screen, c.get_color(), rect)
         if c.d == S:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),

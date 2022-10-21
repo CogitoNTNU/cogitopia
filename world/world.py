@@ -33,8 +33,8 @@ class World:
         self.sun = Sun(self.size, self)
         self.creatures = []
 
-    def spawn_creature(self, x, y):
-        creature = Creature(x, y, self)
+    def spawn_creature(self, x, y, color):
+        creature = Creature(x, y, self, color)
         self.creatures.append(creature)
         return creature
 
@@ -63,3 +63,4 @@ class World:
         if creature.get_food() <= 0:
             print("Creature starved to death")
             return True
+        return False

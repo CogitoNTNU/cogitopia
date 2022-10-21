@@ -2,14 +2,13 @@ from random import randrange
 
 import numpy as np
 
-N, E, S, W = range(4)
-
 
 class Creature:
-    EAT, TURN_L, TURN_R, WALK = range(4)
+    N, E, S, W = range(4)
+    EAT, TURN_L, TURN_R, WALK, STAY = range(5)
     RIGHT, LEFT = range(2)
 
-    def __init__(self, x, y, world):
+    def __init__(self, x, y, world, color):
         self.x = x
         self.y = y
         self.d = randrange(4)
@@ -17,9 +16,11 @@ class Creature:
         self.action_buffer = None
         self.world = world
         self.food = 1
+        self.color = color
 
     def request_action(self, action):
         self.action_buffer = action
+        self.food -= 0.001
 
         if self.action_buffer == Creature.WALK:
             x1, y1 = self.front()
@@ -53,13 +54,13 @@ class Creature:
             self.d = (self.d - 1) % 4
 
     def walk(self):
-        if self.d == N:
+        if self.d == self.N:
             self.y = (self.y + 1) % self.grid_size
-        elif self.d == S:
+        elif self.d == self.S:
             self.y = (self.y - 1) % self.grid_size
-        elif self.d == E:
+        elif self.d == self.E:
             self.x = (self.x + 1) % self.grid_size
-        elif self.d == W:
+        elif self.d == self.W:
             self.x = (self.x - 1) % self.grid_size
 
     def vision(self, world):
@@ -77,14 +78,16 @@ class Creature:
         return np.unravel_index(grass.argmax(), grass.shape)
 
     def front(self):
-        if self.d == N:
+        if self.d == self.N:
             return self.x, (self.y + 1) % self.grid_size
-        elif self.d == S:
+        if self.d == self.S:
             return self.x, (self.y - 1) % self.grid_size
-        elif self.d == E:
+        if self.d == self.E:
             return (self.x + 1) % self.grid_size, self.y
-        else:
-            return (self.x - 1) % self.grid_size, self.y
+        return (self.x - 1) % self.grid_size, self.y
 
     def get_food(self):
         return self.food
+
+    def get_color(self):
+        return self.color
