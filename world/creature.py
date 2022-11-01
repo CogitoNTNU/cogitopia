@@ -45,6 +45,7 @@ class Creature:
         
         if self.food > 0.9:
             self.world.reproduction_callback(self)
+            self.food -= 0.5
         
         self.food -= 0.02
 
