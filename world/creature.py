@@ -2,52 +2,69 @@ from random import randrange
 
 import numpy as np
 
-N, E, S, W = range(4)
-LEFT, RIGHT, FORWARD = range(3)
-
 
 class Creature:
-    EAT, TURN_L, TURN_R, WALK = range(4)
+    N, E, S, W = range(4)
+    EAT, TURN_L, TURN_R, WALK, STAY, DIE = range(6)
+    RIGHT, LEFT = range(2)
 
-    def __init__(self, x, y, world):
+    def __init__(self, x, y, world, color):
         self.x = x
         self.y = y
-        self.d = randrange(3)
+        self.d = randrange(4)
         self.grid_size = world.size
         self.action_buffer = None
         self.world = world
+        self.food = 1
+        self.color = color
+        self.inf_loop = False
 
     def request_action(self, action):
         self.action_buffer = action
+        self.food -= 0.001
+
+        if self.action_buffer == Creature.WALK:
+            x1, y1 = self.front()
+            if self.world.water.get_value(x1, y1) > 0:
+                return False
+
+        if self.action_buffer == Creature.EAT:
+            if self.world.grass.get_value(self.x, self.y) < 0.05:
+                return False
+
+        return True
 
     def process_action(self):
         if self.action_buffer == Creature.EAT:
-            self.world.grass.eat_grass(self.y, self.x)
+            amount = self.world.grass.eat_grass(self.x, self.y)
+            self.food += amount
+            self.food = np.clip(self.food, -1, 1)
         if self.action_buffer == Creature.TURN_L:
-            self.turn(1)
+            self.turn(Creature.LEFT)
         if self.action_buffer == Creature.TURN_R:
-            self.turn(0)
+            self.turn(Creature.RIGHT)
         if self.action_buffer == Creature.WALK:
             self.walk()
+        if self.action_buffer == Creature.DIE:
+            self.inf_loop = True
 
-    def turn(self, direction): # direction 0 = right, 1 = left
-        if direction == 0:
-            self.d = (self.d - 1) % 4
-        if direction == 1:
+        self.food -= 0.02
+
+    def turn(self, direction):  # direction 0 = right, 1 = left
+        if direction == Creature.RIGHT:
             self.d = (self.d + 1) % 4
+        if direction == Creature.LEFT:
+            self.d = (self.d - 1) % 4
 
     def walk(self):
-        if self.d == N:
-            self.y = (self.y + 1) % self.grid_size
-        elif self.d == S:
+        if self.d == self.N:
             self.y = (self.y - 1) % self.grid_size
-        elif self.d == E:
-            self.x = (self.x - 1) % self.grid_size
-        elif self.d == W:
+        elif self.d == self.S:
+            self.y = (self.y + 1) % self.grid_size
+        elif self.d == self.E:
             self.x = (self.x + 1) % self.grid_size
-        elif self.d == 0:
-            self.x = self.x
-            self.y = self.y
+        elif self.d == self.W:
+            self.x = (self.x - 1) % self.grid_size
 
     def vision(self, world):
         grass = np.zeros(9)
@@ -63,8 +80,20 @@ class Creature:
         grass = grass.reshape(3, 3)
         return np.unravel_index(grass.argmax(), grass.shape)
 
+    def front(self):
+        if self.d == self.N:
+            return self.x, (self.y - 1) % self.grid_size
+        if self.d == self.S:
+            return self.x, (self.y + 1) % self.grid_size
+        if self.d == self.E:
+            return (self.x + 1) % self.grid_size, self.y
+        return (self.x - 1) % self.grid_size, self.y
 
-'''
-    def move_towards(self, world):
-        max = self.vision(world)
-'''
+    def get_food(self):
+        return self.food
+
+    def get_color(self):
+        return self.color
+
+    def get_inf_loop(self):
+        return self.inf_loop

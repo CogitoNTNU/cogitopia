@@ -4,12 +4,12 @@ from .layer import Layer
 
 
 class Sun(Layer):
-    def __init__(self, size):
+    def __init__(self, size, world):
         initial = np.zeros((size, size))
-        Layer.__init__(self, size, initial)
+        Layer.__init__(self, size, initial, world)
 
     def step(self, time):
-        for i in range(len(self.grid)):
+        for i in range(self.size):
             self.grid[i].fill(abs(np.cos(time / 24 * 2 * np.pi + i * np.pi / self.size)))
 
     @staticmethod
