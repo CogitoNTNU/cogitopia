@@ -18,7 +18,7 @@ from .creature import Creature
 
 class WorldSettings:
     """Global settings."""
-    grass_growth_rate = 10
+    grass_growth_rate = 0.2
 
 
 # Variables that change during simulation, such

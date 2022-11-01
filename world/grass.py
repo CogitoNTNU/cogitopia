@@ -8,7 +8,7 @@ class Grass(Layer):
         Layer.__init__(self, size, initial, world)
 
     def step(self):
-        self.grid += self.world.earth.get_layer() * 0.005 * 0.2
+        self.grid += self.world.earth.get_layer() * 0.005 * self.world.settings.grass_growth_rate
         self.grid = np.clip(self.grid, 0, 1)
 
     def eat_grass(self, x, y):
