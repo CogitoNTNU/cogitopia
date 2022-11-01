@@ -8,8 +8,6 @@ from j_agent import JAgent
 from rendering import Renderer
 from world.world import World, WorldSettings
 
-    
-
 # Grid size is the number of cells in the world
 grid_size = 20
 
@@ -26,7 +24,7 @@ if __name__ == '__main__':
 
     # World setup
     ws = WorldSettings()
-    ws.grass_growth_rate = 5  # Example use of ws
+    ws.grass_growth_rate = 1  # Example use of ws
 
     world = World(grid_size, ws)
     renderer = Renderer(world, scale, screen)

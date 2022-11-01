@@ -16,7 +16,7 @@ class Creature:
         self.grid_size = world.size
         self.action_buffer = None
         self.world = world
-        self.food = 1
+        self.food = .5
         self.color = color
         self.inf_loop = False
         self.id = Creature.ID_COUNTER
@@ -43,7 +43,7 @@ class Creature:
         if self.action_buffer == Creature.DIE:
             self.inf_loop = True
         
-        if len(self.world.creatures) < 5:
+        if self.food > 0.9:
             self.world.reproduction_callback(self)
         
         self.food -= 0.02
