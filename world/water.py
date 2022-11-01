@@ -1,3 +1,4 @@
+"""Water layer."""
 import numpy as np
 
 from .layer import Layer
@@ -25,4 +26,4 @@ class Water(Layer):
         return 0, 0, value * 2000 + 50
 
     def is_water(self, x, y):
-        return self.get_value(x, y) > 0
+        return self.get_value(x % self.world.size, y % self.world.size) > 0

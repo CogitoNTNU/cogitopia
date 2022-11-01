@@ -1,3 +1,6 @@
+"""
+Module representing the world.
+"""
 from random import randint
 from perlin_noise import PerlinNoise
 
@@ -9,11 +12,12 @@ from .water import Water
 from .sun import Sun
 from .creature import Creature
 
+
 # WorldSettings should have all constants that
 # are related to the simulation (not rendering)
 
-
 class WorldSettings:
+    """Global settings."""
     grass_growth_rate = 10
 
 
@@ -21,8 +25,8 @@ class WorldSettings:
 # as time, belongs in the World class
 
 class World:
-    def __init__(self, size, ws):
-        self.ws = ws
+    def __init__(self, size, settings):
+        self.settings = settings
         self.time = 0
         self.size = size
         self.grass = Grass(self.size, self.initialize(), self)
@@ -33,14 +37,14 @@ class World:
         self.sun = Sun(self.size, self)
         self.creatures = []
 
-    def spawn_creature(self, x, y, color):
-        creature = Creature(x, y, self, color)
+    def spawn_creature(self, x_pos, y_pos, color):
+        creature = Creature(x_pos, y_pos, self, color)
         self.creatures.append(creature)
         return creature
 
     def step(self):
-        for c in self.creatures:
-            c.process_action()
+        for creature in self.creatures:
+            creature.process_action()
 
         self.grass.step()
         self.earth.step()
@@ -62,5 +66,8 @@ class World:
     def is_dead(creature):
         if creature.get_food() <= 0:
             print("Creature starved to death")
+            return True
+        elif creature.get_inf_loop():
+            print("Creature got stuck in an infinite loop and died")
             return True
         return False

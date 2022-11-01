@@ -5,7 +5,7 @@ import numpy as np
 
 class Creature:
     N, E, S, W = range(4)
-    EAT, TURN_L, TURN_R, WALK, STAY = range(5)
+    EAT, TURN_L, TURN_R, WALK, STAY, DIE = range(6)
     RIGHT, LEFT = range(2)
 
     def __init__(self, x, y, world, color):
@@ -17,6 +17,7 @@ class Creature:
         self.world = world
         self.food = 1
         self.color = color
+        self.inf_loop = False
 
     def request_action(self, action):
         self.action_buffer = action
@@ -44,6 +45,8 @@ class Creature:
             self.turn(Creature.RIGHT)
         if self.action_buffer == Creature.WALK:
             self.walk()
+        if self.action_buffer == Creature.DIE:
+            self.inf_loop = True
 
         self.food -= 0.02
 
@@ -55,9 +58,9 @@ class Creature:
 
     def walk(self):
         if self.d == self.N:
-            self.y = (self.y + 1) % self.grid_size
-        elif self.d == self.S:
             self.y = (self.y - 1) % self.grid_size
+        elif self.d == self.S:
+            self.y = (self.y + 1) % self.grid_size
         elif self.d == self.E:
             self.x = (self.x + 1) % self.grid_size
         elif self.d == self.W:
@@ -79,9 +82,9 @@ class Creature:
 
     def front(self):
         if self.d == self.N:
-            return self.x, (self.y + 1) % self.grid_size
-        if self.d == self.S:
             return self.x, (self.y - 1) % self.grid_size
+        if self.d == self.S:
+            return self.x, (self.y + 1) % self.grid_size
         if self.d == self.E:
             return (self.x + 1) % self.grid_size, self.y
         return (self.x - 1) % self.grid_size, self.y
@@ -91,3 +94,6 @@ class Creature:
 
     def get_color(self):
         return self.color
+
+    def get_inf_loop(self):
+        return self.inf_loop

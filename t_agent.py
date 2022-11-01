@@ -1,66 +1,81 @@
+"""Torgeirs (stupid) agent"""
+import numpy as np
 from world.creature import Creature
 
 
 class TAgent:
+    """Agent moving towards best grass in range"""
+
+    OWN_POS = 0, 0
+
     def __init__(self, world, creature):
         self.world = world
         self.creature = creature
+        self.vision_range = 3
+        self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
+        self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
 
     def step(self):
+        """Runs through logic to decide next action."""
         valid = False
         turn = 0
         while not valid:
             action = self.logic()
             valid = self.creature.request_action(action)
             turn += 1
-            print(turn)
-            print(action)
+            if turn >= 100:
+                self.creature.request_action(self.creature.DIE)
+                valid = True
 
     def logic(self):
-        # Find best grass
-        # Find path
-        # Find direction to go
-        x = self.creature.x
-        y = self.creature.y
-        max_grass = self.world.grass.get_value(x, y)
-        grass_pos = x, y
-        for i in [-1, 0, 1]:
-            for j in [-1, 0, 1]:
-                if i == j == 0:
-                    continue
-                value = self.world.grass.get_value((x + i) % self.world.size, (y + j) % self.world.size)
-                if value > max_grass and not self.world.water.is_water(x + i, y + j):
-                    max_grass = value
-                    grass_pos = (x + i) % self.world.size, (y + j) % self.world.size
+        """Decides what action to take next"""
+        self.vision()
+        grass_pos = np.unravel_index(np.argmax(self.grass), shape=self.grass.shape)
+        grass_pos = grass_pos[0] - self.vision_range, grass_pos[1] - self.vision_range
 
-        if self.creature.get_food() < 0.3 and self.world.grass.get_value(x, y) > 0.05:
+        if self.creature.get_food() < 0.3 and self.get_grass(self.OWN_POS) > 0.05:
             return Creature.EAT
-        if value > 0.05:
-            if grass_pos[0] < x:
-                if self.creature.d == self.creature.W:
-                    return Creature.WALK
-                if self.creature.d == self.creature.N:
-                    return Creature.TURN_L
-                return Creature.TURN_R
 
-            if grass_pos[0] > x:
-                if self.creature.d == self.creature.E:
-                    return Creature.WALK
-                if self.creature.d == self.creature.N:
-                    return Creature.TURN_R
-                return Creature.TURN_L
+        if grass_pos == self.OWN_POS:
+            return Creature.STAY
 
-            if grass_pos[0] > y:
-                if self.creature.d == self.creature.N:
-                    return Creature.WALK
-                if self.creature.d == self.creature.W:
-                    return Creature.TURN_R
-                return Creature.TURN_L
+        grass_direction = self.best_direction(grass_pos)
+        return self.move(grass_direction)
 
-            if grass_pos[0] < y:
-                if self.creature.d == self.creature.S:
-                    return Creature.WALK
-                if self.creature.d == self.creature.E:
-                    return Creature.TURN_R
-                return Creature.TURN_L
-        return Creature.STAY
+    def move(self, direction):
+        """Move in given direction if facing the right way, else turn towards that direction"""
+        if self.creature.d == direction:
+            return Creature.WALK
+        if self.creature.d - direction == 1:
+            return Creature.TURN_L
+        return Creature.TURN_R
+
+    @staticmethod
+    def best_direction(pos):
+        """Find best direction to walk given destination in relative position (i, j)"""
+        if abs(pos[0]) >= abs(pos[1]):
+            if pos[0] < 0:
+                return Creature.W
+            return Creature.E
+        if pos[1] < 0:
+            return Creature.N
+        return Creature.S
+
+    def get_grass(self, pos):
+        """Get grass value from relative position (i, j)"""
+        return self.world.grass.get_value((self.creature.x + pos[0]) % self.world.size,
+                                          (self.creature.y + pos[1]) % self.world.size)
+
+    def is_walkable(self, pos):
+        """Checks if a tile can be walked on."""
+        walkable = True
+        if self.world.water.is_water(self.creature.x + pos[0], self.creature.y + pos[1]):
+            walkable = False
+        return walkable
+
+    def vision(self):
+        """Finds grass in vision range, and finds walkable tiles."""
+        for i in range(-self.vision_range, self.vision_range + 1):
+            for j in range(-self.vision_range, self.vision_range + 1):
+                self.grass[self.vision_range + i][self.vision_range + j] = self.get_grass((i, j))
+                self.walkable[self.vision_range + i][self.vision_range + j] = self.is_walkable((i, j))

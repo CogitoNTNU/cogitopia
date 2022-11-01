@@ -30,7 +30,7 @@ class Renderer:
         (N, E, S, W) = [0, 1, 2, 3]
         rect = pygame.Rect(c.x * self.scale, c.y * self.scale, self.scale, self.scale)
         pygame.draw.rect(self.screen, c.get_color(), rect)
-        if c.d == S:
+        if c.d == N:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale)), 3)
@@ -38,7 +38,7 @@ class Renderer:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),
                              ((c.x * self.scale), (c.y * self.scale) + self.scale / 2), 3)
-        elif c.d == N:
+        elif c.d == S:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale), 3)
