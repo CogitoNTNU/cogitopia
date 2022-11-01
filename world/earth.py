@@ -11,10 +11,9 @@ class Earth(Layer):
 
     def step(self):
         """Updates earth layer, removing nutrents? seems to move towards equilibrium"""
-        self.grid *= (1 - self.grid * 0.005)
-        self.grid += 0.005 * 0.005
+        self.grid += (self.world.grass.grid - (self.grid)) * 0.4
         self.grid = np.clip(self.grid, 0, 1)
-
+        
     @staticmethod
     def get_color(value):
         """Returns color value"""

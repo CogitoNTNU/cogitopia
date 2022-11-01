@@ -65,7 +65,8 @@ if __name__ == '__main__':
         # Render everything and display
         screen.fill((0, 0, 0))
         renderer.draw_world()
+        renderer
         pygame.display.flip()
-        clock.tick(3)
+        clock.tick(60)
 
     pygame.quit()

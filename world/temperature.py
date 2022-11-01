@@ -11,10 +11,19 @@ class Temperature(Layer):
         for j in range(self.size):
             for i in range(self.size):
                 for neighbor in self.get_neighbors(i, j):
-                    if self.grid[neighbor[0]][neighbor[1]] - self.grid[j][i] < 0:
+                        rate = 0.1 * ((self.grid[i][j] - self.grid[neighbor[0]][neighbor[1]]))
                         self.grid[neighbor[0]][neighbor[1]] += 0.01 * (1 - self.grid[neighbor[0]][neighbor[1]])
-                        self.grid[j][i] -= 0.01 * (1 - self.grid[neighbor[0]][neighbor[1]])
+                        self.grid[i][j] -= 0.01 * (1 - self.grid[neighbor[0]][neighbor[1]])
                         self.grid = np.clip(self.grid, 0, 1)
+                        self.grid = np.clip(self.grid, 0, 1)
+                        self.grid[i][j] -= rate
+
+        self.grid += 0.1 * self.world.sun.grid[5]
+        self.grid -= 0.01
+        self.grid = np.clip(self.grid, 0, 1)
+
+
+
 
     @staticmethod
     def get_color(value):

@@ -48,6 +48,7 @@ class World:
 
         self.grass.step()
         self.earth.step()
+        self.temperature.step()
         self.sun.step(self.time)
         self.inc_time()
 

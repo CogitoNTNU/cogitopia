@@ -9,8 +9,16 @@ class Sun(Layer):
         Layer.__init__(self, size, initial, world)
 
     def step(self, time):
-        for i in range(self.size):
-            self.grid[i].fill(abs(np.cos(time / 24 * 2 * np.pi + i * np.pi / self.size)))
+        mu = len(self.grid[0]) / 2
+        sigma = len(self.grid[0]) / 4
+        for i in range(len(self.grid)):
+            self.grid[i] = (np.cos(time / 24 * 2 * np.pi + (i) * 2 * np.pi / len(self.grid)) + 0.3)
+
+        for i in range(len(self.grid)):
+            self.grid[:,i] *= 1 / (sigma * np.sqrt(2 * np.pi)) * np.exp(-((i - mu) / (sigma)) ** 2 * 0.5) * 10
+
+        self.grid = np.clip(self.grid, 0, 1)
+
 
     @staticmethod
     def get_color(value):
