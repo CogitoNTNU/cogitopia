@@ -23,19 +23,10 @@ class Creature:
         Creature.ID_COUNTER += 1
 
     def request_action(self, action):
-        self.action_buffer = action
-        self.food -= 0.001
-
-        if self.action_buffer == Creature.WALK:
-            x1, y1 = self.front()
-            if self.world.water.get_value(x1, y1) > 0:
-                return False
-
-        if self.action_buffer == Creature.EAT:
-            if self.world.grass.get_value(self.x, self.y) < 0.05:
-                return False
-
-        return True
+        if action in range(6):
+            self.action_buffer = action
+            return True
+        return False
 
     def process_action(self):
         if self.action_buffer == Creature.EAT:
