@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     # World setup
     ws = WorldSettings()
-    ws.grass_growth_rate = 1  # Example use of ws
+    ws.grass_growth_rate = 2  # Example use of ws
 
     world = World(grid_size, ws)
     renderer = Renderer(world, scale, screen)

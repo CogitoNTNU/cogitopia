@@ -24,6 +24,7 @@ class Renderer:
                 test = pygame.Surface((self.scale,self.scale))
                 test.set_alpha((1-self.world.sun.grid[x][y])*30)
                 self.screen.blit(test, (x*self.scale, y*self.scale))
+        self.draw_hud()
 
     def draw_layer(self, layer):
         for x in range(self.size):
@@ -31,7 +32,6 @@ class Renderer:
                 if layer.get_value(x, y) != 0:
                     pygame.draw.rect(self.screen, layer.get_color(layer.get_value(x, y)),
                                      (self.scale * x, self.scale * y, self.scale, self.scale))
-
 
     def draw_creature(self, c):
         (N, E, S, W) = [0, 1, 2, 3]
@@ -53,3 +53,15 @@ class Renderer:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),
                              ((c.x * self.scale) + self.scale, (c.y * self.scale) + self.scale / 2), 3)
+    
+    def draw_hud(self):
+        texts = [
+            'Creatures alive: {}'.format(len(self.world.creatures)),
+            'World time: {}'.format(self.world.time)
+        ]
+
+        for i, text in enumerate(texts):
+            font = pygame.font.SysFont(None, 24)
+            img = font.render(text, True, (255, 255, 255))
+            self.screen.blit(img, (16, 16 + i * 24))
+    
