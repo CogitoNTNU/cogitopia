@@ -1,12 +1,11 @@
 from world.creature import Creature
 import numpy as np
+from base_agent import AgentBase
 
-
-class Agent:
+class Agent(AgentBase):
     def __init__(self, world, creature):
-        self.world = world
-        self.creature = creature
-
+        super(Agent, self).__init__(world, creature)
+        
     def step(self):
         valid = False
         while not valid:

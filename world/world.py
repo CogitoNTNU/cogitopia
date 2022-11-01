@@ -18,7 +18,7 @@ from .creature import Creature
 
 class WorldSettings:
     """Global settings."""
-    grass_growth_rate = 10
+    grass_growth_rate = 0.2
 
 
 # Variables that change during simulation, such
@@ -36,6 +36,7 @@ class World:
         self.water = Water(self.size, self.height, self)
         self.sun = Sun(self.size, self)
         self.creatures = []
+        self.reproduction_callback = lambda : None
 
     def spawn_creature(self, x_pos, y_pos, color):
         creature = Creature(x_pos, y_pos, self, color)
@@ -48,6 +49,7 @@ class World:
 
         self.grass.step()
         self.earth.step()
+        self.temperature.step()
         self.sun.step(self.time)
         self.inc_time()
 
@@ -65,9 +67,9 @@ class World:
     @staticmethod
     def is_dead(creature):
         if creature.get_food() <= 0:
-            print("Creature starved to death")
+            print("Creature {} starved to death".format(creature.id))
             return True
         elif creature.get_inf_loop():
-            print("Creature got stuck in an infinite loop and died")
+            print("Creature {} got stuck in an infinite loop and died".format(creature.id))
             return True
         return False

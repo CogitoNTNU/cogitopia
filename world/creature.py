@@ -7,6 +7,7 @@ class Creature:
     N, E, S, W = range(4)
     EAT, TURN_L, TURN_R, WALK, STAY, DIE = range(6)
     RIGHT, LEFT = range(2)
+    ID_COUNTER = 0
 
     def __init__(self, x, y, world, color):
         self.x = x
@@ -18,21 +19,15 @@ class Creature:
         self.food = 1
         self.color = color
         self.inf_loop = False
+        self.id = Creature.ID_COUNTER
+        self.agent_type = None
+        Creature.ID_COUNTER += 1
 
     def request_action(self, action):
-        self.action_buffer = action
-        self.food -= 0.001
-
-        if self.action_buffer == Creature.WALK:
-            x1, y1 = self.front()
-            if self.world.water.get_value(x1, y1) > 0:
-                return False
-
-        if self.action_buffer == Creature.EAT:
-            if self.world.grass.get_value(self.x, self.y) < 0.05:
-                return False
-
-        return True
+        if action in range(6):
+            self.action_buffer = action
+            return True
+        return False
 
     def process_action(self):
         if self.action_buffer == Creature.EAT:
@@ -47,7 +42,10 @@ class Creature:
             self.walk()
         if self.action_buffer == Creature.DIE:
             self.inf_loop = True
-
+        
+        if len(self.world.creatures) < 5:
+            self.world.reproduction_callback(self)
+        
         self.food -= 0.02
 
     def turn(self, direction):  # direction 0 = right, 1 = left

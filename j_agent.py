@@ -3,7 +3,7 @@ import numpy as np
 from world.creature import Creature
 from base_agent import AgentBase
 
-class TAgent(AgentBase):
+class JAgent(AgentBase):
     """Agent moving towards best grass in range"""
 
     OWN_POS = 0, 0
@@ -12,9 +12,8 @@ class TAgent(AgentBase):
         self.vision_range = 3
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
-        super(TAgent, self).__init__(world, creature)
+        super(JAgent, self).__init__(world, creature)
         
-
     def step(self):
         """Runs through logic to decide next action."""
         action = self.logic()
@@ -64,6 +63,9 @@ class TAgent(AgentBase):
         """Checks if a tile can be walked on."""
         walkable = True
         if self.world.water.is_water(self.creature.x + pos[0], self.creature.y + pos[1]):
+            walkable = False
+        occ = [(c.x, c.y) for c in self.world.creatures]
+        if (self.creature.x + pos[0], self.creature.y + pos[1]) in occ:
             walkable = False
         return walkable
 
