@@ -18,7 +18,8 @@ from .creature import Creature
 
 class WorldSettings:
     """Global settings."""
-    grass_growth_rate = 0.2
+    grass_growth_rate = 1
+    use_temp = False
 
 
 # Variables that change during simulation, such
@@ -49,7 +50,7 @@ class World:
 
         self.grass.step()
         self.earth.step()
-        self.temperature.step()
+        if self.settings.use_temp: self.temperature.step()
         self.sun.step(self.time)
         self.inc_time()
 
