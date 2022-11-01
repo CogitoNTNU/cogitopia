@@ -1,31 +1,25 @@
 """Torgeirs (stupid) agent"""
 import numpy as np
 from world.creature import Creature
+from base_agent import AgentBase
 
-
-class TAgent:
+class TAgent(AgentBase):
     """Agent moving towards best grass in range"""
 
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
-        self.world = world
-        self.creature = creature
         self.vision_range = 3
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
+        super(TAgent, self).__init__(world, creature)
+        
 
     def step(self):
         """Runs through logic to decide next action."""
-        valid = False
-        turn = 0
-        while not valid:
-            action = self.logic()
-            valid = self.creature.request_action(action)
-            turn += 1
-            if turn >= 100:
-                self.creature.request_action(self.creature.DIE)
-                valid = True
+        action = self.logic()
+        valid = self.creature.request_action(action)
+        assert valid, 'Invalid action!'
 
     def logic(self):
         """Decides what action to take next"""

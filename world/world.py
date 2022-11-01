@@ -36,6 +36,7 @@ class World:
         self.water = Water(self.size, self.height, self)
         self.sun = Sun(self.size, self)
         self.creatures = []
+        self.reproduction_callback = lambda : None
 
     def spawn_creature(self, x_pos, y_pos, color):
         creature = Creature(x_pos, y_pos, self, color)

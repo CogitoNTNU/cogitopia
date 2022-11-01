@@ -20,6 +20,7 @@ class Creature:
         self.color = color
         self.inf_loop = False
         self.id = Creature.ID_COUNTER
+        self.agent_type = None
         Creature.ID_COUNTER += 1
 
     def request_action(self, action):
@@ -41,7 +42,10 @@ class Creature:
             self.walk()
         if self.action_buffer == Creature.DIE:
             self.inf_loop = True
-
+        
+        if len(self.world.creatures) < 5:
+            self.world.reproduction_callback(self)
+        
         self.food -= 0.02
 
     def turn(self, direction):  # direction 0 = right, 1 = left

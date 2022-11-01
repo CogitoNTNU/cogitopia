@@ -1,19 +1,18 @@
 """Torgeirs (stupid) agent"""
 import numpy as np
 from world.creature import Creature
+from base_agent import AgentBase
 
-
-class JAgent:
+class JAgent(AgentBase):
     """Agent moving towards best grass in range"""
 
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
-        self.world = world
-        self.creature = creature
         self.vision_range = 3
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
+        super(JAgent, self).__init__(world, creature)
         
     def step(self):
         """Runs through logic to decide next action."""
