@@ -7,6 +7,7 @@ class Creature:
     N, E, S, W = range(4)
     EAT, TURN_L, TURN_R, WALK, STAY, DIE = range(6)
     RIGHT, LEFT = range(2)
+    ID_COUNTER = 0
 
     def __init__(self, x, y, world, color):
         self.x = x
@@ -18,6 +19,8 @@ class Creature:
         self.food = 1
         self.color = color
         self.inf_loop = False
+        self.id = Creature.ID_COUNTER
+        Creature.ID_COUNTER += 1
 
     def request_action(self, action):
         self.action_buffer = action
