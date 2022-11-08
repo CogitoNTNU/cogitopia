@@ -57,8 +57,8 @@ class TAgent(AgentBase):
 
     def get_grass(self, pos):
         """Get grass value from relative position (i, j)"""
-        return self.world.grass.get_value((self.creature.x + pos[0]) % self.world.size,
-                                          (self.creature.y + pos[1]) % self.world.size)
+        return self.world.grass.get_value((self.creature.x + pos[0]) % self.world.grid_width,
+                                          (self.creature.y + pos[1]) % self.world.grid_height)
 
     def is_walkable(self, pos):
         """Checks if a tile can be walked on."""

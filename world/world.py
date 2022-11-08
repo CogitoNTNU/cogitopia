@@ -26,16 +26,17 @@ class WorldSettings:
 # as time, belongs in the World class
 
 class World:
-    def __init__(self, size, settings):
+    def __init__(self, grid_width, grid_height, settings):
         self.settings = settings
         self.time = 0
-        self.size = size
-        self.grass = Grass(self.size, self.initialize(), self)
-        self.earth = Earth(self.size, self.initialize(), self)
-        self.temperature = Temperature(self.size, self.initialize(), self)
-        self.height = Height(self.size, self.initialize(1), self)
-        self.water = Water(self.size, self.height, self)
-        self.sun = Sun(self.size, self)
+        self.grid_width = grid_width
+        self.grid_height = grid_height
+        self.grass = Grass(self.grid_width, self.grid_height, self.initialize(), self)
+        self.earth = Earth(self.grid_width, self.grid_height, self.initialize(), self)
+        self.temperature = Temperature(self.grid_width, self.grid_height, self.initialize(), self)
+        self.height = Height(self.grid_width, self.grid_height, self.initialize(1), self)
+        self.water = Water(self.grid_width, self.grid_height, self.height, self)
+        self.sun = Sun(self.grid_width, self.grid_height, self)
         self.creatures = []
         self.reproduction_callback = lambda : None
 
@@ -56,7 +57,7 @@ class World:
 
     def initialize(self, octaves=5):
         noise = PerlinNoise(octaves=octaves, seed=randint(1, 20))
-        pic = [[abs(noise([i / self.size, j / self.size])) for j in range(self.size)] for i in range(self.size)]
+        pic = [[abs(noise([i / self.grid_width, j / self.grid_height])) for j in range(self.grid_height)] for i in range(self.grid_width)]
         return pic
 
     def get_time(self):
