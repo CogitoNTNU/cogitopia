@@ -3,17 +3,17 @@ import numpy as np
 from world.creature import Creature
 from base_agent import AgentBase
 
+
 class TAgent(AgentBase):
     """Agent moving towards best grass in range"""
 
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
-        self.vision_range = 3
+        self.vision_range = 2
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         super(TAgent, self).__init__(world, creature)
-        
 
     def step(self):
         """Runs through logic to decide next action."""
@@ -29,6 +29,9 @@ class TAgent(AgentBase):
 
         if self.creature.get_food() < 0.3 and self.get_grass(self.OWN_POS) > 0.05:
             return Creature.EAT
+
+        if self.creature.get_food() > 0.8:
+            return Creature.REPRODUCE
 
         if grass_pos == self.OWN_POS:
             return Creature.STAY

@@ -11,6 +11,11 @@ class Grass(Layer):
         self.grid += 0.005 * self.world.sun.grid * self.world.settings.grass_growth_rate
         self.grid *= (1 - (self.world.earth.grid) * 0.005)
         if self.world.settings.use_temp: self.grid -= ((abs(self.world.temperature.grid - 0.5) - (self.world.temperature.grid - 0.5)) )* 0.005
+        for i in range(self.grid_width):
+            for j in range(self.grid_height):
+                if self.world.water.is_water(i, j):
+                    self.grid[i][j] = 0
+
         self.grid = np.clip(self.grid, 0, 1)
 
     def eat_grass(self, x, y):
