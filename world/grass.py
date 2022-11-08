@@ -4,8 +4,8 @@ from .layer import Layer
 
 
 class Grass(Layer):
-    def __init__(self, size, initial, world):
-        Layer.__init__(self, size, initial, world)
+    def __init__(self, grid_width, grid_height, initial, world):
+        Layer.__init__(self, grid_width, grid_height, initial, world)
 
     def step(self):
         self.grid += 0.005 * self.world.sun.grid * self.world.settings.grass_growth_rate

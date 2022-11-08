@@ -13,7 +13,6 @@ class Creature:
         self.x = x
         self.y = y
         self.d = randrange(4)
-        self.grid_size = world.size
         self.action_buffer = None
         self.world = world
         self.food = .5
@@ -57,13 +56,13 @@ class Creature:
 
     def walk(self):
         if self.d == self.N:
-            self.y = (self.y - 1) % self.grid_size
+            self.y = (self.y - 1) % self.world.grid_height
         elif self.d == self.S:
-            self.y = (self.y + 1) % self.grid_size
+            self.y = (self.y + 1) % self.world.grid_height
         elif self.d == self.E:
-            self.x = (self.x + 1) % self.grid_size
+            self.x = (self.x + 1) % self.world.grid_width
         elif self.d == self.W:
-            self.x = (self.x - 1) % self.grid_size
+            self.x = (self.x - 1) % self.world.grid_width
 
     def vision(self, world):
         grass = np.zeros(9)
@@ -81,12 +80,12 @@ class Creature:
 
     def front(self):
         if self.d == self.N:
-            return self.x, (self.y - 1) % self.grid_size
+            return self.x, (self.y - 1) % self.grid_height
         if self.d == self.S:
-            return self.x, (self.y + 1) % self.grid_size
+            return self.x, (self.y + 1) % self.grid_height
         if self.d == self.E:
-            return (self.x + 1) % self.grid_size, self.y
-        return (self.x - 1) % self.grid_size, self.y
+            return (self.x + 1) % self.grid_width, self.y
+        return (self.x - 1) % self.grid_width, self.y
 
     def get_food(self):
         return self.food

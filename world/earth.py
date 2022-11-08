@@ -6,8 +6,8 @@ from .layer import Layer
 
 class Earth(Layer):
     """Earth layer provides nutrients to grass layer and modifies growth rate."""
-    def __init__(self, size, initial, world):
-        Layer.__init__(self, size, initial, world)
+    def __init__(self, grid_width, grid_height, initial, world):
+        Layer.__init__(self, grid_width, grid_height, initial, world)
 
     def step(self):
         """Updates earth layer, removing nutrents? seems to move towards equilibrium"""

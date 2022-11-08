@@ -4,23 +4,22 @@ from .layer import Layer
 
 
 class Temperature(Layer):
-    def __init__(self, size, initial, world):
-        Layer.__init__(self, size, initial, world)
+    def __init__(self, grid_width,grid_height, initial, world):
+        Layer.__init__(self, grid_width,grid_height, initial, world)
 
     def step(self):
-        for j in range(self.size):
-            for i in range(self.size):
-                for neighbor in self.get_neighbors(i, j):
-                        rate = 0.1 * ((self.grid[i][j] - self.grid[neighbor[0]][neighbor[1]]))
-                        self.grid[neighbor[0]][neighbor[1]] += 0.01 * (1 - self.grid[neighbor[0]][neighbor[1]])
-                        self.grid[i][j] -= 0.01 * (1 - self.grid[neighbor[0]][neighbor[1]])
-                        self.grid = np.clip(self.grid, 0, 1)
-                        self.grid = np.clip(self.grid, 0, 1)
-                        self.grid[i][j] -= rate
-
-        self.grid += 0.1 * self.world.sun.grid[5]
-        self.grid -= 0.01
+        temp_grid = self.grid.copy()
+        temp_grid = np.c_[temp_grid,temp_grid[:,0]]
+        diff = np.diff(temp_grid,axis = 1)
+        self.grid += 0.1*(diff)
+        temp_grid = self.grid.copy()
+        temp_grid = np.r_[temp_grid, [temp_grid[0]]]
+        diff = np.diff(temp_grid, axis = 0)
+        self.grid += 0.1*(diff)
+        self.grid += 0.1 * self.world.sun.grid
+        self.grid -= 0.03 *self.world.height.grid
         self.grid = np.clip(self.grid, 0, 1)
+
 
 
 
