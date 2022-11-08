@@ -24,7 +24,9 @@ if __name__ == '__main__':
 
     # World setup
     ws = WorldSettings()
+    ws.use_temp = True
     ws.grass_growth_rate = 4  # Example use of ws
+
 
     world = World(grid_width, grid_height, ws)
     renderer = Renderer(world, scale, screen)
@@ -82,6 +84,6 @@ if __name__ == '__main__':
         renderer.draw_world()
         renderer
         pygame.display.flip()
-        clock.tick(0)
+        clock.tick(30)
 
     pygame.quit()
