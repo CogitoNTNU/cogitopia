@@ -8,6 +8,8 @@ from j_agent import JAgent
 from rendering import Renderer
 from world.world import World, WorldSettings
 
+
+
 # Grid size is the number of cells in the world
 grid_width, grid_height = (40, 20)
 
@@ -52,11 +54,11 @@ if __name__ == '__main__':
         if world.water.get_value(x, y) == 0:
             c = world.spawn_creature(x, y, (100, 50, 50))
             agents.append(JAgent(world, c))
-    
+
     def reproduction_callback(parent):
         c = world.spawn_creature(parent.x, parent.y, parent.color)
         agents.append(parent.agent_type(world, c))
-        
+
     world.reproduction_callback = reproduction_callback
 
     running = True
@@ -66,12 +68,11 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            while event.type == pygame.KEYDOWN:
-                pass
 
         # Step agents
         for agent in agents:
             if agent.world.is_dead(agent.creature):
+                agent.creature.remove_from_array()
                 agents.remove(agent)
                 world.creatures.remove(agent.creature)
             else:
@@ -82,7 +83,6 @@ if __name__ == '__main__':
         # Render everything and display
         screen.fill((0, 0, 0))
         renderer.draw_world()
-        renderer
         pygame.display.flip()
         clock.tick(30)
 
