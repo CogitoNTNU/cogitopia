@@ -2,8 +2,9 @@ import numpy as np
 
 
 class Layer:
-    def __init__(self, size, initial, world):
-        self.size = size
+    def __init__(self, grid_width, grid_height, initial, world):
+        self.grid_width = grid_width 
+        self.grid_height = grid_height
         self.grid = np.array(initial)
         self.world = world
 
@@ -18,12 +19,12 @@ class Layer:
 
     def get_neighbors(self, i, j):
         neighbors = np.zeros((8, 2), dtype=np.dtype('i2'))
-        neighbors[7] = [(i + 1) % self.size, (j - 1) % self.size]
-        neighbors[6] = [(i - 1) % self.size, (j - 1) % self.size]
-        neighbors[5] = [(i - 1) % self.size, (j + 1) % self.size]
-        neighbors[4] = [(i + 1) % self.size, (j + 1) % self.size]
-        neighbors[3] = [i, (j + 1) % self.size]
-        neighbors[1] = [i, (j - 1) % self.size]
-        neighbors[2] = [(i + 1) % self.size, j]
-        neighbors[0] = [(i - 1) % self.size, j]
+        neighbors[7] = [(i + 1) % self.grid_width, (j - 1) % self.grid_height]
+        neighbors[6] = [(i - 1) % self.grid_width, (j - 1) % self.grid_height]
+        neighbors[5] = [(i - 1) % self.grid_width, (j + 1) % self.grid_height]
+        neighbors[4] = [(i + 1) % self.grid_width, (j + 1) % self.grid_height]
+        neighbors[3] = [i, (j + 1) % self.grid_height]
+        neighbors[1] = [i, (j - 1) % self.grid_height]
+        neighbors[2] = [(i + 1) % self.grid_width, j]
+        neighbors[0] = [(i - 1) % self.grid_width, j]
         return neighbors

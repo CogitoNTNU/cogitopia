@@ -4,12 +4,12 @@ from .layer import Layer
 
 
 class Temperature(Layer):
-    def __init__(self, size, initial, world):
-        Layer.__init__(self, size, initial, world)
+    def __init__(self, grid_width, grid_height, initial, world):
+        Layer.__init__(self, grid_width, grid_height, initial, world)
 
     def step(self):
-        for j in range(self.size):
-            for i in range(self.size):
+        for j in range(self.grid_height):
+            for i in range(self.grid_width):
                 for neighbor in self.get_neighbors(i, j):
                         rate = 0.1 * ((self.grid[i][j] - self.grid[neighbor[0]][neighbor[1]]))
                         self.grid[neighbor[0]][neighbor[1]] += 0.01 * (1 - self.grid[neighbor[0]][neighbor[1]])

@@ -10,7 +10,8 @@ class Renderer:
         self.scale = scale
         self.world = world
         self.screen = screen
-        self.size = world.size
+        self.grid_width = world.grid_width
+        self.grid_height = world.grid_height
 
     def draw_world(self):
         self.draw_layer(self.world.grass)
@@ -19,16 +20,16 @@ class Renderer:
         for c in self.world.creatures:
             self.draw_creature(c)
 
-        for x in range(self.size):
-            for y in range(self.size):
+        for x in range(self.grid_width):
+            for y in range(self.grid_height):
                 test = pygame.Surface((self.scale,self.scale))
                 test.set_alpha((1-self.world.sun.grid[x][y])*30)
                 self.screen.blit(test, (x*self.scale, y*self.scale))
         self.draw_hud()
 
     def draw_layer(self, layer):
-        for x in range(self.size):
-            for y in range(self.size):
+        for x in range(self.grid_width):
+            for y in range(self.grid_height):
                 if layer.get_value(x, y) != 0:
                     pygame.draw.rect(self.screen, layer.get_color(layer.get_value(x, y)),
                                      (self.scale * x, self.scale * y, self.scale, self.scale))

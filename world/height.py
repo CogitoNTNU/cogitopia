@@ -2,8 +2,8 @@ from .layer import Layer
 
 
 class Height(Layer):
-    def __init__(self, size, initial, world):
-        Layer.__init__(self, size, initial, world)
+    def __init__(self, grid_width, grid_height, initial, world):
+        Layer.__init__(self, grid_width, grid_height, initial, world)
 
     @staticmethod
     def get_color(value):
