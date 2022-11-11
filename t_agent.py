@@ -10,7 +10,7 @@ class TAgent(AgentBase):
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
-        self.vision_range = 2
+        self.vision_range = 4
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         super(TAgent, self).__init__(world, creature)
@@ -27,11 +27,12 @@ class TAgent(AgentBase):
         grass_pos = np.unravel_index(np.argmax(self.grass), shape=self.grass.shape)
         grass_pos = grass_pos[0] - self.vision_range, grass_pos[1] - self.vision_range
 
-        if self.creature.get_food() < 0.3 and self.get_grass(self.OWN_POS) > 0.05:
-            return Creature.EAT
-
         if self.creature.get_food() > 0.8:
             return Creature.REPRODUCE
+
+        if self.creature.get_food() < 1.3 and self.get_grass(self.OWN_POS) > 0.05:
+            return Creature.EAT
+
 
         if grass_pos == self.OWN_POS:
             return Creature.STAY
