@@ -1,5 +1,6 @@
 """Torgeirs (stupid) agent"""
 import numpy as np
+import random
 from world.creature import Creature
 from base_agent import AgentBase
 
@@ -7,6 +8,7 @@ class TAgent(AgentBase):
     """Agent moving towards best grass in range"""
 
     OWN_POS = 0, 0
+    """ pos_data = [0, 0, 0, 0] """
 
     def __init__(self, world, creature):
         self.vision_range = 3
@@ -38,22 +40,37 @@ class TAgent(AgentBase):
 
     def move(self, direction):
         """Move in given direction if facing the right way, else turn towards that direction"""
+        """ self.pos_data[direction] += 1 """
         if self.creature.d == direction:
             return Creature.WALK
-        if self.creature.d - direction == 1:
+        elif (self.creature.d - direction) % 4 == 1:
             return Creature.TURN_L
-        return Creature.TURN_R
+        elif (self.creature.d - direction) % 4 == -1:
+            return Creature.TURN_R
+        else:
+            return random.choice([Creature.TURN_L, Creature.TURN_R])
 
-    @staticmethod
-    def best_direction(pos):
+    def best_direction(self, pos):
         """Find best direction to walk given destination in relative position (i, j)"""
-        if abs(pos[0]) >= abs(pos[1]):
+        if pos[0] == 0 and pos[1] == 0:
+            return int(random.choice([0, 1, 2, 3, self.creature.d]))
+        elif pos[0] == 0:
+            return int((Creature.E + pos[1]/abs(pos[1])))
+        elif pos[1] == 0:
+            return int(((pos[0]/abs(pos[0])) % 4))
+        else:
+            pos_choices = [Creature.S + pos[1]/abs(pos[1]), ((pos[0]/abs(pos[0])) % 4)]
+            if self.creature.d in pos_choices:
+                pos_choices.append(self.creature.d)
+            return int(random.choice(pos_choices))
+
+        """ if abs(pos[0]) >= abs(pos[1]):
             if pos[0] < 0:
                 return Creature.W
             return Creature.E
         if pos[1] < 0:
             return Creature.N
-        return Creature.S
+        return Creature.S """
 
     def get_grass(self, pos):
         """Get grass value from relative position (i, j)"""

@@ -9,10 +9,10 @@ from rendering import Renderer
 from world.world import World, WorldSettings
 
 # Grid size is the number of cells in the world
-grid_size = 20
+grid_size = 40
 
 # Scale is the pixel size of each world cell on screen
-scale = 32
+scale = 16
 
 pygame.init()
 screen = pygame.display.set_mode([grid_size * scale, grid_size * scale])
@@ -24,27 +24,27 @@ if __name__ == '__main__':
 
     # World setup
     ws = WorldSettings()
-    ws.grass_growth_rate = 2  # Example use of ws
+    ws.grass_growth_rate = 0.5  # Example use of ws
 
     world = World(grid_size, ws)
     renderer = Renderer(world, scale, screen)
     agents = []
 
-    while len(agents) < 1:
+    while len(agents) < 10:
         x = random.randrange(grid_size)
         y = random.randrange(grid_size)
         if world.water.get_value(x, y) == 0:
             c = world.spawn_creature(x, y, (0, 0, 0))
             agents.append(Agent(world, c))
 
-    while len(agents) < 2:
+    while len(agents) < 20:
         x = random.randrange(grid_size)
         y = random.randrange(grid_size)
         if world.water.get_value(x, y) == 0:
             c = world.spawn_creature(x, y, (50, 50, 50))
             agents.append(TAgent(world, c))
 
-    while len(agents) < 3:
+    while len(agents) < 30:
         x = random.randrange(grid_size)
         y = random.randrange(grid_size)
         if world.water.get_value(x, y) == 0:
