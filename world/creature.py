@@ -16,6 +16,7 @@ class Creature:
         self.action_buffer = None
         self.world = world
         self.food = 0.4
+        self.meat = 10
         self.color = color
         self.is_dead = False
         self.id = Creature.ID_COUNTER
@@ -33,7 +34,11 @@ class Creature:
         if self.is_dead:
             return
         if self.action_buffer == Creature.EAT:
-            amount = self.world.grass.eat_grass(self.x, self.y)
+            if self.predator:
+                amount = self.eat_meat(1 - self.food)
+                self.food += amount
+            else:
+                amount = self.world.grass.eat_grass(self.x, self.y)
             self.food += amount
             self.food = np.clip(self.food, -1, 1)
         if self.action_buffer == Creature.TURN_L:
@@ -54,6 +59,7 @@ class Creature:
             self.food -= 0.5
         if self.action_buffer == Creature.KILL:
             self.kill()
+            self.food -= 0.3
 
     def turn(self, direction):  # direction 0 = right, 1 = left
         if direction == Creature.RIGHT:
@@ -109,3 +115,10 @@ class Creature:
 
     def remove_from_array(self):
         self.world.creatures_array[self.x][self.y].remove(self)
+
+    def eat_meat(self, amount):
+        for creature in self.world.get_creatures_at_location(self.x, self.y):
+            if creature != self and creature.is_dead:
+                eaten = min(amount, creature.meat)
+                creature.meat -= amount
+                return eaten
