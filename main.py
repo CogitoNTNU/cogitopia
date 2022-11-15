@@ -8,11 +8,12 @@ from j_agent import JAgent
 from rendering import Renderer
 from world.world import World, WorldSettings
 
+
 # Grid size is the number of cells in the world
 grid_width, grid_height = (40, 20)
 
 # Scale is the pixel size of each world cell on screen
-scale = 16
+scale = 32
 
 pygame.init()
 screen = pygame.display.set_mode([grid_width * scale, grid_height * scale])
@@ -24,8 +25,8 @@ if __name__ == '__main__':
 
     # World setup
     ws = WorldSettings()
-    ws.use_temp = True
-    ws.grass_growth_rate = 4  # Example use of ws
+    ws.use_temp = False
+    ws.grass_growth_rate = 1000# Example use of ws
 
 
     world = World(grid_width, grid_height, ws)
@@ -52,11 +53,11 @@ if __name__ == '__main__':
         if world.water.get_value(x, y) == 0:
             c = world.spawn_creature(x, y, (100, 50, 50))
             agents.append(JAgent(world, c))
-    
+
     def reproduction_callback(parent):
         c = world.spawn_creature(parent.x, parent.y, parent.color)
         agents.append(parent.agent_type(world, c))
-        
+
     world.reproduction_callback = reproduction_callback
 
     running = True
@@ -66,12 +67,11 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            while event.type == pygame.KEYDOWN:
-                pass
 
         # Step agents
         for agent in agents:
             if agent.world.is_dead(agent.creature):
+                agent.creature.remove_from_array()
                 agents.remove(agent)
                 world.creatures.remove(agent.creature)
             else:
@@ -82,8 +82,8 @@ if __name__ == '__main__':
         # Render everything and display
         screen.fill((0, 0, 0))
         renderer.draw_world()
-        renderer
         pygame.display.flip()
-        clock.tick(30)
+        clock.tick(100)
+        clock.tick(0)
 
     pygame.quit()

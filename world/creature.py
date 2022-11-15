@@ -5,7 +5,7 @@ import numpy as np
 
 class Creature:
     N, E, S, W = range(4)
-    EAT, TURN_L, TURN_R, WALK, STAY, DIE = range(6)
+    EAT, TURN_L, TURN_R, WALK, STAY, DIE, REPRODUCE = range(7)
     RIGHT, LEFT = range(2)
     ID_COUNTER = 0
 
@@ -15,7 +15,7 @@ class Creature:
         self.d = randrange(4)
         self.action_buffer = None
         self.world = world
-        self.food = .5
+        self.food = 0.4
         self.color = color
         self.inf_loop = False
         self.id = Creature.ID_COUNTER
@@ -23,7 +23,7 @@ class Creature:
         Creature.ID_COUNTER += 1
 
     def request_action(self, action):
-        if action in range(6):
+        if action in range(7):
             self.action_buffer = action
             return True
         return False
@@ -35,18 +35,24 @@ class Creature:
             self.food = np.clip(self.food, -1, 1)
         if self.action_buffer == Creature.TURN_L:
             self.turn(Creature.LEFT)
+            self.food -= 0.0005
         if self.action_buffer == Creature.TURN_R:
             self.turn(Creature.RIGHT)
+            self.food -= 0.0005
         if self.action_buffer == Creature.WALK:
+            self.world.creatures_array[self.x][self.y].remove(self)
             self.walk()
+            self.world.creatures_array[self.x][self.y].append(self)
+            if self.world.water.is_water(self.x, self.y):
+                self.food -= 0.008
+            self.food -= 0.002
         if self.action_buffer == Creature.DIE:
             self.inf_loop = True
-        
-        if self.food > 0.9:
+            self.world.reproduction_callback(self)
+        if self.action_buffer == Creature.REPRODUCE:
             self.world.reproduction_callback(self)
             self.food -= 0.5
-        
-        self.food -= 0.02
+
 
     def turn(self, direction):  # direction 0 = right, 1 = left
         if direction == Creature.RIGHT:
@@ -93,5 +99,5 @@ class Creature:
     def get_color(self):
         return self.color
 
-    def get_inf_loop(self):
-        return self.inf_loop
+    def remove_from_array(self):
+        self.world.creatures_array[self.x][self.y].remove(self)

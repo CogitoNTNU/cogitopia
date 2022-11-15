@@ -2,6 +2,7 @@
 Module representing the world.
 """
 from random import randint
+import numpy as np
 from perlin_noise import PerlinNoise
 
 from .earth import Earth
@@ -38,11 +39,13 @@ class World:
         self.water = Water(self.grid_width, self.grid_height, self.height, self)
         self.sun = Sun(self.grid_width, self.grid_height, self)
         self.creatures = []
-        self.reproduction_callback = lambda : None
+        self.reproduction_callback = lambda: None
+        self.creatures_array = [[[] for _ in range(self.grid_height)] for _ in range(self.grid_width)]
 
     def spawn_creature(self, x_pos, y_pos, color):
         creature = Creature(x_pos, y_pos, self, color)
         self.creatures.append(creature)
+        self.creatures_array[x_pos][y_pos].append(creature)
         return creature
 
     def step(self):
@@ -51,7 +54,8 @@ class World:
 
         self.grass.step()
         self.earth.step()
-        if self.settings.use_temp: self.temperature.step()
+        if self.settings.use_temp:
+            self.temperature.step()
         self.sun.step(self.time)
         self.inc_time()
 
@@ -71,7 +75,7 @@ class World:
         if creature.get_food() <= 0:
             print("Creature {} starved to death".format(creature.id))
             return True
-        elif creature.get_inf_loop():
-            print("Creature {} got stuck in an infinite loop and died".format(creature.id))
-            return True
         return False
+
+    def get_creatures_at_location(self, x, y):
+        return self.creatures_array[x][y]
