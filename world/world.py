@@ -76,3 +76,6 @@ class World:
             print("Creature {} starved to death".format(creature.id))
             return True
         return False
+
+    def get_creatures_at_location(self, x, y):
+        return self.creatures_array[x][y]
