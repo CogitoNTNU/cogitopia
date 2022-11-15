@@ -26,8 +26,7 @@ if __name__ == '__main__':
     # World setup
     ws = WorldSettings()
     ws.use_temp = False
-    ws.grass_growth_rate = 1000# Example use of ws
-
+    ws.grass_growth_rate = 1# Example use of ws
 
     world = World(grid_width, grid_height, ws)
     renderer = Renderer(world, scale, screen)
@@ -70,12 +69,12 @@ if __name__ == '__main__':
 
         # Step agents
         for agent in agents:
-            if agent.world.is_dead(agent.creature):
-                agent.creature.remove_from_array()
-                agents.remove(agent)
-                world.creatures.remove(agent.creature)
-            else:
-                agent.step()
+            #if agent.world.is_dead(agent.creature):
+            #    agent.creature.remove_from_array()
+            #    agents.remove(agent)
+            #    world.creatures.remove(agent.creature)
+            #else:
+            agent.step()
         # Step world
         world.step()
 

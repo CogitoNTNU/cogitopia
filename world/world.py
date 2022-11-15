@@ -75,6 +75,8 @@ class World:
         if creature.get_food() <= 0:
             print("Creature {} starved to death".format(creature.id))
             return True
+        if creature.is_dead:
+            return True
         return False
 
     def get_creatures_at_location(self, x, y):

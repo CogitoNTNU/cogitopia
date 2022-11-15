@@ -1,11 +1,11 @@
-from random import randrange
+from random import randrange, choice
 
 import numpy as np
 
 
 class Creature:
     N, E, S, W = range(4)
-    EAT, TURN_L, TURN_R, WALK, STAY, DIE, REPRODUCE = range(7)
+    EAT, TURN_L, TURN_R, WALK, STAY, DIE, REPRODUCE, KILL = range(8)
     RIGHT, LEFT = range(2)
     ID_COUNTER = 0
 
@@ -17,18 +17,21 @@ class Creature:
         self.world = world
         self.food = 0.4
         self.color = color
-        self.inf_loop = False
+        self.is_dead = False
         self.id = Creature.ID_COUNTER
         self.agent_type = None
         Creature.ID_COUNTER += 1
+        self.predator = True
 
     def request_action(self, action):
-        if action in range(7):
+        if action in range(8):
             self.action_buffer = action
             return True
         return False
 
     def process_action(self):
+        if self.is_dead:
+            return
         if self.action_buffer == Creature.EAT:
             amount = self.world.grass.eat_grass(self.x, self.y)
             self.food += amount
@@ -46,13 +49,11 @@ class Creature:
             if self.world.water.is_water(self.x, self.y):
                 self.food -= 0.008
             self.food -= 0.002
-        if self.action_buffer == Creature.DIE:
-            self.inf_loop = True
-            self.world.reproduction_callback(self)
         if self.action_buffer == Creature.REPRODUCE:
             self.world.reproduction_callback(self)
             self.food -= 0.5
-
+        if self.action_buffer == Creature.KILL:
+            self.kill()
 
     def turn(self, direction):  # direction 0 = right, 1 = left
         if direction == Creature.RIGHT:
@@ -69,6 +70,13 @@ class Creature:
             self.x = (self.x + 1) % self.world.grid_width
         elif self.d == self.W:
             self.x = (self.x - 1) % self.world.grid_width
+
+    def kill(self):
+        creature = self
+        while creature != self and creature.is_dead:
+            creature = choice(self.world.get_creatures_at_location(self.x, self.y))
+        creature.is_dead = True
+        print("KILL!")
 
     def vision(self, world):
         grass = np.zeros(9)

@@ -25,7 +25,6 @@ class TAgent(AgentBase):
     def logic(self):
         """Decides what action to take next"""
         self.vision()
-        print(self.other_creatures)
         grass_pos = np.unravel_index(np.argmax(self.grass), shape=self.grass.shape)
         grass_pos = grass_pos[0] - self.vision_range, grass_pos[1] - self.vision_range
 
@@ -37,6 +36,9 @@ class TAgent(AgentBase):
 
         if grass_pos == self.OWN_POS:
             return Creature.STAY
+
+        if len(self.world.get_creatures_at_location(self.creature.x, self.creature.y)) > 1:
+            return Creature.KILL
 
         grass_direction = self.best_direction(grass_pos)
         return self.move(grass_direction)
