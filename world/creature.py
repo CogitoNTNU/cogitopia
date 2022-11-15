@@ -60,6 +60,7 @@ class Creature:
             if self.predator:
                 self.kill()
                 self.food -= 0.3
+
         self.food -= 0.0002
         self.action_buffer = None
 
@@ -80,11 +81,10 @@ class Creature:
             self.x = (self.x - 1) % self.world.grid_width
 
     def kill(self):
-        creature = self
-        while creature != self and creature.is_dead:
-            creature = choice(self.world.get_creatures_at_location(self.x, self.y))
-        creature.is_dead = True
-        print("KILL!")
+        for creature in self.world.get_creatures_at_location(self.x, self.y):
+            if creature != self and not creature.is_dead:
+                creature.is_dead = True
+                print("KILL!")
 
     def vision(self, world):
         grass = np.zeros(9)
