@@ -69,12 +69,13 @@ if __name__ == '__main__':
 
         # Step agents
         for agent in agents:
-            #if agent.world.is_dead(agent.creature):
-            #    agent.creature.remove_from_array()
-            #    agents.remove(agent)
-            #    world.creatures.remove(agent.creature)
-            #else:
-            agent.step()
+            if agent.world.is_dead(agent.creature):
+                #agent.creature.remove_from_array()
+                #agents.remove(agent)
+                #world.creatures.remove(agent.creature)
+                pass
+            else:
+                agent.step()
         # Step world
         world.step()
 

@@ -13,14 +13,15 @@ class TAgent(AgentBase):
         self.vision_range = 4
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
-        self.other_creatures = [[[] for _ in range(self.vision_range * 2 +1)] for _ in range(self.vision_range * 2 + 1)]
+        self.other_creatures = [[[] for _ in range(self.vision_range * 2 + 1)] for _ in range(self.vision_range * 2 + 1)]
         super(TAgent, self).__init__(world, creature)
 
     def step(self):
         """Runs through logic to decide next action."""
-        action = self.logic()
-        valid = self.creature.request_action(action)
-        assert valid, 'Invalid action!'
+        if self.check_creature():
+            action = self.logic()
+            valid = self.creature.request_action(action)
+            assert valid, 'Invalid action!'
 
     def logic(self):
         """Decides what action to take next"""
@@ -37,7 +38,7 @@ class TAgent(AgentBase):
         if grass_pos == self.OWN_POS:
             return Creature.STAY
 
-        if len(self.world.get_creatures_at_location(self.creature.x, self.creature.y)) > 1:
+        if len(self.world.get_creatures_at_location(self.creature.x, self.creature.y)) > 1 and self.creature.predator:
             return Creature.KILL
 
         grass_direction = self.best_direction(grass_pos)

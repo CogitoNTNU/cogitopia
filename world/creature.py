@@ -22,7 +22,7 @@ class Creature:
         self.id = Creature.ID_COUNTER
         self.agent_type = None
         Creature.ID_COUNTER += 1
-        self.predator = True
+        self.predator = False
 
     def request_action(self, action):
         if action in range(8):
@@ -36,7 +36,6 @@ class Creature:
         if self.action_buffer == Creature.EAT:
             if self.predator:
                 amount = self.eat_meat(1 - self.food)
-                self.food += amount
             else:
                 amount = self.world.grass.eat_grass(self.x, self.y)
             self.food += amount
@@ -58,8 +57,11 @@ class Creature:
             self.world.reproduction_callback(self)
             self.food -= 0.5
         if self.action_buffer == Creature.KILL:
-            self.kill()
-            self.food -= 0.3
+            if self.predator:
+                self.kill()
+                self.food -= 0.3
+        self.food -= 0.0002
+        self.action_buffer = None
 
     def turn(self, direction):  # direction 0 = right, 1 = left
         if direction == Creature.RIGHT:
@@ -122,3 +124,4 @@ class Creature:
                 eaten = min(amount, creature.meat)
                 creature.meat -= amount
                 return eaten
+        return 0
