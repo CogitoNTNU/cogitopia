@@ -9,7 +9,7 @@ class Creature:
     RIGHT, LEFT = range(2)
     ID_COUNTER = 0
 
-    def __init__(self, x, y, world, color):
+    def __init__(self, x, y, world, color, predator):
         self.x = x
         self.y = y
         self.d = randrange(4)
@@ -22,7 +22,7 @@ class Creature:
         self.id = Creature.ID_COUNTER
         self.agent_type = None
         Creature.ID_COUNTER += 1
-        self.predator = False
+        self.predator = predator
 
     def request_action(self, action):
         if action in range(8):

@@ -42,8 +42,8 @@ class World:
         self.reproduction_callback = lambda: None
         self.creatures_array = [[[] for _ in range(self.grid_height)] for _ in range(self.grid_width)]
 
-    def spawn_creature(self, x_pos, y_pos, color):
-        creature = Creature(x_pos, y_pos, self, color)
+    def spawn_creature(self, x_pos, y_pos, color, predator):
+        creature = Creature(x_pos, y_pos, self, color, predator)
         self.creatures.append(creature)
         self.creatures_array[x_pos][y_pos].append(creature)
         return creature
@@ -77,7 +77,7 @@ class World:
     @staticmethod
     def is_dead(creature):
         if creature.get_food() <= 0:
-            print("Creature {} starved to death".format(creature.id))
+            # print("Creature {} starved to death".format(creature.id))
             return True
         return creature.is_dead
 

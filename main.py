@@ -36,25 +36,25 @@ if __name__ == '__main__':
         x = random.randrange(grid_width)
         y = random.randrange(grid_height)
         if world.water.get_value(x, y) == 0:
-            c = world.spawn_creature(x, y, (0, 0, 0))
+            c = world.spawn_creature(x, y, (0, 0, 0), False)
             agents.append(Agent(world, c))
 
     while len(agents) < 2:
         x = random.randrange(grid_width)
         y = random.randrange(grid_height)
         if world.water.get_value(x, y) == 0:
-            c = world.spawn_creature(x, y, (50, 50, 50))
+            c = world.spawn_creature(x, y, (50, 50, 50), False)
             agents.append(TAgent(world, c))
 
     while len(agents) < 3:
         x = random.randrange(grid_width)
         y = random.randrange(grid_height)
         if world.water.get_value(x, y) == 0:
-            c = world.spawn_creature(x, y, (100, 50, 50))
+            c = world.spawn_creature(x, y, (100, 50, 50), False)
             agents.append(JAgent(world, c))
 
     def reproduction_callback(parent):
-        c = world.spawn_creature(parent.x, parent.y, parent.color)
+        c = world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
         agents.append(parent.agent_type(world, c))
 
     world.reproduction_callback = reproduction_callback
