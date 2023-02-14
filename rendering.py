@@ -43,7 +43,7 @@ class Renderer:
     def draw_creature(self, c):
         (N, E, S, W) = [0, 1, 2, 3]
         rect = pygame.Rect(c.x * self.scale, c.y * self.scale, self.scale, self.scale)
-        pygame.draw.rect(self.screen, c.get_color(), rect)
+        pygame.draw.rect(self.screen, c.get_color() if not c.is_dead else (1.,1.,1.,1.), rect)
         if c.d == N:
             pygame.draw.line(self.screen, red,
                              ((c.x * self.scale) + self.scale / 2, (c.y * self.scale) + self.scale / 2),
@@ -63,7 +63,8 @@ class Renderer:
     
     def draw_hud(self):
         texts = [
-            'Creatures alive: {}'.format(len(self.world.creatures)),
+            'Creatures total: {}'.format(len(self.world.creatures)),
+            'Creatures alive: {}'.format(len(list(filter(lambda x: not x.is_dead,self.world.creatures)))),
             'World time: {}'.format(self.world.time)
         ]
 
