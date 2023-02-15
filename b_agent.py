@@ -11,7 +11,7 @@ class BAgent(AgentBase):
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
-        self.vision_range = 3
+        self.vision_range = 1
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         super(BAgent, self).__init__(world, creature)
@@ -29,19 +29,22 @@ class BAgent(AgentBase):
         #self.vision()
         grass_pos = np.unravel_index(np.argmax(self.grass), shape=self.grass.shape)
         grass_pos = grass_pos[0] - self.vision_range, grass_pos[1] - self.vision_range
-        if random.randint(0,27) == 7:
-            return Creature.TURN_R
-        if random.randint(0,17) == 7:
-            return Creature.TURN_L
-        if random.randint(0, 12) == 7:
-            return Creature.WALK
-        if self.creature.get_food() > 0.2 and self.creature.get_food() < 0.35 and random.randint(0,1) == 1:
-            return Creature.KILL
 
         if self.creature.get_food() > 0.95:
             return Creature.REPRODUCE
-
-        if self.creature.get_food() < 0.75:
+        if self.creature.get_food() <= 0.1 or (0.50 > self.creature.get_food() > 0.45):
+            if random.randint(6, 9) == 7:
+                return Creature.WALK
+            return Creature.EAT
+        if random.randint(0,16) == 7:
+            return Creature.TURN_R
+        if random.randint(0,17) == 7:
+            return Creature.TURN_L
+        if random.randint(6, 9) == 7:
+            return Creature.WALK
+        if self.creature.get_food() > 0.25 and self.creature.get_food() < 0.35 and random.randint(0,2) == 1:
+            return Creature.KILL
+        if self.creature.get_food() < 0.95:
             return Creature.EAT
 
 

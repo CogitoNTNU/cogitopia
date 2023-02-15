@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # World setup
     ws = WorldSettings()
     ws.use_temp = False
-    ws.grass_growth_rate = 1.1235813*3# Example use of ws
+    ws.grass_growth_rate = 1.1235813*8# Example use of ws
 
     world = World(grid_width, grid_height, ws)
     renderer = Renderer(world, scale, screen)
@@ -43,12 +43,12 @@ if __name__ == '__main__':
             c = world.spawn_creature(x, y, (50, 50, 50), False)
             agents.append(TAgent(world, c))
 
-    for _ in range(100):
-        x = random.randrange(grid_width)
-        y = random.randrange(grid_height)
-        if world.water.get_value(x, y) == 0:
-            c = world.spawn_creature(x, y, (100, 50, 50), False)
-            agents.append(JAgent(world, c))
+   # for _ in range(100):
+   #     x = random.randrange(grid_width)
+   #     y = random.randrange(grid_height)
+   #     if world.water.get_value(x, y) == 0:
+   #         c = world.spawn_creature(x, y, (100, 50, 50), False)
+   #         agents.append(JAgent(world, c))
     for _ in range(100):
         x = random.randrange(grid_width)
         y = random.randrange(grid_height)
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         for agent in agents:
             if agent.world.is_dead(agent.creature):
                 #agent.creature.remove_from_array()
-                #agents.remove(agent)
+                agents.remove(agent)
                 #world.creatures.remove(agent.creature)
                 pass
             else:

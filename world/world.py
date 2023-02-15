@@ -51,9 +51,9 @@ class World:
     def step(self):
         for creature in self.creatures:
             creature.process_action()
-            if creature.is_dead and creature.meat == 0:
-                self.creatures.remove(creature)
-                self.creatures_array.remove(creature)
+            #if creature.is_dead and creature.meat < 0:
+                #self.creatures.remove(creature)
+                #self.creatures_array.remove(creature)
 
         self.grass.step()
         self.earth.step()

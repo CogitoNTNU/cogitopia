@@ -2,6 +2,8 @@ from random import randrange, choice
 
 import numpy as np
 
+from math import log2
+
 
 class Creature:
     N, E, S, W = range(4)
@@ -16,7 +18,7 @@ class Creature:
         self.action_buffer = None
         self.world = world
         self.food = 0.4
-        self.meat = 10
+        self.meat = np.log2(self.food)
         self.color = color
         self.is_dead = False
         self.id = Creature.ID_COUNTER
@@ -31,6 +33,7 @@ class Creature:
         return False
 
     def process_action(self):
+
         if self.is_dead:
             return
         if self.action_buffer == Creature.EAT:
@@ -39,6 +42,7 @@ class Creature:
             else:
                 amount = self.world.grass.eat_grass(self.x, self.y)
             self.food += amount
+            self.meat = log2(2**self.meat+amount)
             self.food = np.clip(self.food, -1, 1)
         if self.action_buffer == Creature.TURN_L:
             self.turn(Creature.LEFT)
@@ -59,7 +63,7 @@ class Creature:
         if self.action_buffer == Creature.KILL:
             if self.predator:
                 self.kill()
-                self.food -= 0.3
+                self.food -= 0.2
 
         self.food -= 0.0002
         self.action_buffer = None
@@ -121,7 +125,11 @@ class Creature:
     def eat_meat(self, amount):
         for creature in self.world.get_creatures_at_location(self.x, self.y):
             if creature != self and creature.is_dead:
-                eaten = min(amount, creature.meat)
+                eaten = min((amount, creature.meat))
+                eaten = max((eaten, 0))
                 creature.meat -= amount
+                if creature.meat < 0:
+                    creature.remove_from_array()
+                    creature.world.creatures.remove(creature)
                 return eaten
         return 0
