@@ -14,6 +14,7 @@ class Renderer:
         self.grid_height = world.grid_height
 
     def draw_world(self):
+        self.draw_layer(self.world.earth)
         self.draw_layer(self.world.grass)
         self.draw_layer(self.world.water)
         self.draw_sun()

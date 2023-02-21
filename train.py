@@ -5,7 +5,7 @@ from base_agent import AgentBase
 import gym
 
 
-class TrainAgent(AgentBase, gym.Env):
+class TrainAgent(AgentBase):
 
     OWN_POS = 0, 0
 
@@ -17,27 +17,17 @@ class TrainAgent(AgentBase, gym.Env):
         creature.color=(255,255,255)
         super(TrainAgent, self).__init__(world, creature)
 
-    def step(self):
-        """Runs through logic to decide next action."""
-        reward = 0
-        state = np.array([
-            self.vision(), self.creature.get_food()
-        ])
-        done = False
-        
-        action = self.logic()
-        valid = self.creature.request_action(action)
-        assert valid, 'Invalid action!'
+    #def step(self):
+    #    """Runs through logic to decide next action."""
+    #    
+    #    valid = self.creature.request_action(action)
+    #    assert valid, 'Invalid action!'
 
-        if action == Creature.REPRODUCE:
-            reward = 1
-
-        # Death
+    def tick(self):
+        survive = True
         if self.creature.get_food()<=0:
-            reward = -1
-            done = True
-        
-        return state, reward, done
+            survive=False
+        return survive
 
     def logic(self):
         """Decides what action to take next"""
@@ -53,6 +43,7 @@ class TrainAgent(AgentBase, gym.Env):
     
     def reset(self):
         self.food = 1
+
 
     def move(self, direction):
         """Move in given direction if facing the right way, else turn towards that direction"""
