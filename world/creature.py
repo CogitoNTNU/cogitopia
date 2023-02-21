@@ -17,7 +17,7 @@ class Creature:
         self.d = randrange(4)
         self.action_buffer = None
         self.world = world
-        self.food = 0.4
+        self.food = self.world.settings.creature_starting_food
         self.meat = np.log2(self.food)
         self.color = color
         self.is_dead = False
@@ -46,24 +46,24 @@ class Creature:
             self.food = np.clip(self.food, -1, 1)
         if self.action_buffer == Creature.TURN_L:
             self.turn(Creature.LEFT)
-            self.food -= 0.0005
+            self.food -= self.world.settings.turning_food_cost
         if self.action_buffer == Creature.TURN_R:
             self.turn(Creature.RIGHT)
-            self.food -= 0.0005
+            self.food -= self.world.settings.turning_food_cost
         if self.action_buffer == Creature.WALK:
             self.world.creatures_array[self.x][self.y].remove(self)
             self.walk()
             self.world.creatures_array[self.x][self.y].append(self)
             if self.world.water.is_water(self.x, self.y):
-                self.food -= 0.008
-            self.food -= 0.002
+                self.food -= self.world.settings.walking_in_water_cost
+            self.food -= self.world.settings.walking_food_cost
         if self.action_buffer == Creature.REPRODUCE:
             self.world.reproduction_callback(self)
-            self.food -= 0.5
+            self.food -= self.world.settings.reproduction_cost
         if self.action_buffer == Creature.KILL:
             if self.predator:
                 self.kill()
-                self.food -= 0.2
+                self.food -= self.world.settings.killing_cost
 
         self.food -= 0.0002
         self.action_buffer = None
@@ -88,30 +88,6 @@ class Creature:
         for creature in self.world.get_creatures_at_location(self.x, self.y):
             if creature != self and not creature.is_dead:
                 creature.is_dead = True
-                print("KILL!")
-
-    def vision(self, world):
-        grass = np.zeros(9)
-        grass[0] = world.get_grass(self.x - 1, self.y - 1)
-        grass[1] = world.get_grass(self.x, self.y - 1)
-        grass[2] = world.get_grass(self.x + 1, self.y - 1)
-        grass[3] = world.get_grass(self.x - 1, self.y)
-        grass[4] = world.get_grass(self.x, self.y)
-        grass[5] = world.get_grass(self.x + 1, self.y)
-        grass[6] = world.get_grass(self.x - 1, self.y + 1)
-        grass[7] = world.get_grass(self.x, self.y + 1)
-        grass[8] = world.get_grass(self.x + 1, self.y + 1)
-        grass = grass.reshape(3, 3)
-        return np.unravel_index(grass.argmax(), grass.shape)
-
-    def front(self):
-        if self.d == self.N:
-            return self.x, (self.y - 1) % self.grid_height
-        if self.d == self.S:
-            return self.x, (self.y + 1) % self.grid_height
-        if self.d == self.E:
-            return (self.x + 1) % self.grid_width, self.y
-        return (self.x - 1) % self.grid_width, self.y
 
     def get_food(self):
         return self.food

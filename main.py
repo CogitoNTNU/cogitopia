@@ -1,22 +1,24 @@
 import random
-
+import time
+import git
+import yaml
 import pygame
+import wandb
 
-from agent import Agent
 from t_agent import TAgent
 from j_agent import JAgent
 from b_agent import BAgent
 from rendering import Renderer
 from world.world import World, WorldSettings
-import time
-import wandb
 
+
+ws = WorldSettings()
 
 # Grid size is the number of cells in the world
-grid_width, grid_height = (40, 20)
+grid_width, grid_height = (ws.grid_width, ws.grid_height)
 
 # Scale is the pixel size of each world cell on screen
-scale = 32
+scale = ws.scale
 
 pygame.init()
 screen = pygame.display.set_mode([grid_width * scale, grid_height * scale])
@@ -27,29 +29,27 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
 
     # World setup
-    ws = WorldSettings()
-    ws.use_temp = False
-    ws.grass_growth_rate = 1.1235813*8# Example use of ws
 
     world = World(grid_width, grid_height, ws)
     renderer = Renderer(world, scale, screen)
     agents = []
 
 
-    for _ in range(100):
+    for _ in range(ws.t_agent_amount):
         x = random.randrange(grid_width)
         y = random.randrange(grid_height)
         if world.water.get_value(x, y) == 0:
             c = world.spawn_creature(x, y, (50, 50, 50), False)
             agents.append(TAgent(world, c))
 
-   # for _ in range(100):
+   # for _ in range(ws.j_agent_amount):
    #     x = random.randrange(grid_width)
    #     y = random.randrange(grid_height)
    #     if world.water.get_value(x, y) == 0:
    #         c = world.spawn_creature(x, y, (100, 50, 50), False)
    #         agents.append(JAgent(world, c))
-    for _ in range(100):
+
+    for _ in range(ws.b_agent_amount):
         x = random.randrange(grid_width)
         y = random.randrange(grid_height)
         if world.water.get_value(x, y) == 0:
@@ -62,8 +62,11 @@ if __name__ == '__main__':
 
     world.reproduction_callback = reproduction_callback
 
+    repo = git.Repo(search_parent_directories=True)
+    sha = repo.head.object.hexsha
+
     running = True
-    wandb.init(project="Cogitopia monitor", entity="torghauk-team", config={"growth_rate": ws.grass_growth_rate, "person": "beepboopland"})
+    wandb.init(project="Cogitopia monitor", entity="torghauk-team", config={"growth_rate": ws.grass_growth_rate, "git_hash": sha})
     lastamount = 0
     lasttime = time.time()
     while running:
@@ -99,8 +102,7 @@ if __name__ == '__main__':
         screen.fill((0, 0, 0))
         renderer.draw_world()
         pygame.display.flip()
-        clock.tick(100)
-        clock.tick(0)
+        clock.tick(ws.clock_speed)
 
 
     pygame.quit()
