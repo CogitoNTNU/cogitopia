@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     # World setup
     ws = WorldSettings()
-    ws.use_temp = False
+    ws.use_temp = True
     ws.grass_growth_rate = 1.1235813*8# Example use of ws
 
     world = World(grid_width, grid_height, ws)
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     world.reproduction_callback = reproduction_callback
 
     running = True
-    wandb.init(project="Cogitopia monitor", entity="torghauk-team", config={"growth_rate": ws.grass_growth_rate, "person": "beepboopland"})
+    wandb.init(project="Cogitopia monitor", entity="torghauk-team", config={"growth_rate": ws.grass_growth_rate, "person": "beepboopland", "Temperature": ws.use_temp})
     lastamount = 0
     lasttime = time.time()
     while running:
