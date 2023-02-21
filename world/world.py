@@ -42,8 +42,8 @@ class World:
         self.reproduction_callback = lambda: None
         self.creatures_array = [[[] for _ in range(self.grid_height)] for _ in range(self.grid_width)]
 
-    def spawn_creature(self, x_pos, y_pos, color):
-        creature = Creature(x_pos, y_pos, self, color)
+    def spawn_creature(self, x_pos, y_pos, color, predator):
+        creature = Creature(x_pos, y_pos, self, color, predator)
         self.creatures.append(creature)
         self.creatures_array[x_pos][y_pos].append(creature)
         return creature
@@ -51,6 +51,9 @@ class World:
     def step(self):
         for creature in self.creatures:
             creature.process_action()
+            #if creature.is_dead and creature.meat < 0:
+                #self.creatures.remove(creature)
+                #self.creatures_array.remove(creature)
 
         self.grass.step()
         self.earth.step()
@@ -61,7 +64,8 @@ class World:
 
     def initialize(self, octaves=5):
         noise = PerlinNoise(octaves=octaves, seed=randint(1, 20))
-        pic = [[abs(noise([i / self.grid_width, j / self.grid_height])) for j in range(self.grid_height)] for i in range(self.grid_width)]
+        pic = [[abs(noise([i / self.grid_width, j / self.grid_height])) for j in range(self.grid_height)] for i in
+               range(self.grid_width)]
         return pic
 
     def get_time(self):
@@ -73,9 +77,8 @@ class World:
     @staticmethod
     def is_dead(creature):
         if creature.get_food() <= 0:
-            print("Creature {} starved to death".format(creature.id))
-            return True
-        return False
+            creature.is_dead = True
+        return creature.is_dead
 
     def get_creatures_at_location(self, x, y):
         return self.creatures_array[x][y]
