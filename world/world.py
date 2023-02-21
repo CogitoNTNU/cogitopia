@@ -61,6 +61,7 @@ class World:
         self.creatures = []
         self.reproduction_callback = lambda: None
         self.creatures_array = [[[] for _ in range(self.grid_height)] for _ in range(self.grid_width)]
+        self.murders = 0
 
     def spawn_creature(self, x_pos, y_pos, color, predator):
         creature = Creature(x_pos, y_pos, self, color, predator)
