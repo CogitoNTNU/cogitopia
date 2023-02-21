@@ -4,6 +4,7 @@ Module representing the world.
 from random import randint
 import numpy as np
 from perlin_noise import PerlinNoise
+import yaml
 
 from .earth import Earth
 from .grass import Grass
@@ -19,8 +20,27 @@ from .creature import Creature
 
 class WorldSettings:
     """Global settings."""
-    grass_growth_rate = 1
-    use_temp = False
+    with open("Settings.yml", "r") as stream:
+        try:
+            settings = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+
+    use_temp = settings["use_temp"]
+    grass_growth_rate = settings["grass_growth_rate"]
+    scale = settings["scale"]
+    grid_width = settings["grid_width"]
+    grid_height = settings["grid_height"]
+    t_agent_amount = settings["t_agent_amount"]
+    j_agent_amount = settings["j_agent_amount"]
+    b_agent_amount = settings["b_agent_amount"]
+    clock_speed = settings["clock_speed"]
+    creature_starting_food = settings["creature_starting_food"]
+    turning_food_cost = settings["turning_food_cost"]
+    walking_food_cost = settings["walking_food_cost"]
+    walking_in_water_cost = settings["walking_in_water_cost"]
+    reproduction_cost = settings["reproduction_cost"]
+    killing_cost = settings["killing_cost"]
 
 
 # Variables that change during simulation, such
