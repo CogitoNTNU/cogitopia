@@ -1,37 +1,48 @@
-from random import randrange
+from random import randrange, choice
 
 import numpy as np
+
+from math import log2
 
 
 class Creature:
     N, E, S, W = range(4)
-    EAT, TURN_L, TURN_R, WALK, STAY, DIE, REPRODUCE = range(7)
+    EAT, TURN_L, TURN_R, WALK, STAY, DIE, REPRODUCE, KILL = range(8)
     RIGHT, LEFT = range(2)
     ID_COUNTER = 0
 
-    def __init__(self, x, y, world, color):
+    def __init__(self, x, y, world, color, predator):
         self.x = x
         self.y = y
         self.d = randrange(4)
         self.action_buffer = None
         self.world = world
         self.food = 0.4
+        self.meat = np.log2(self.food)
         self.color = color
-        self.inf_loop = False
+        self.is_dead = False
         self.id = Creature.ID_COUNTER
         self.agent_type = None
         Creature.ID_COUNTER += 1
+        self.predator = predator
 
     def request_action(self, action):
-        if action in range(7):
+        if action in range(8):
             self.action_buffer = action
             return True
         return False
 
     def process_action(self):
+
+        if self.is_dead:
+            return
         if self.action_buffer == Creature.EAT:
-            amount = self.world.grass.eat_grass(self.x, self.y)
+            if self.predator:
+                amount = self.eat_meat(1 - self.food)
+            else:
+                amount = self.world.grass.eat_grass(self.x, self.y)
             self.food += amount
+            self.meat = log2(2**self.meat+amount)
             self.food = np.clip(self.food, -1, 1)
         if self.action_buffer == Creature.TURN_L:
             self.turn(Creature.LEFT)
@@ -46,13 +57,16 @@ class Creature:
             if self.world.water.is_water(self.x, self.y):
                 self.food -= 0.008
             self.food -= 0.002
-        if self.action_buffer == Creature.DIE:
-            self.inf_loop = True
-            self.world.reproduction_callback(self)
         if self.action_buffer == Creature.REPRODUCE:
             self.world.reproduction_callback(self)
             self.food -= 0.5
+        if self.action_buffer == Creature.KILL:
+            if self.predator:
+                self.kill()
+                self.food -= 0.2
 
+        self.food -= 0.0002
+        self.action_buffer = None
 
     def turn(self, direction):  # direction 0 = right, 1 = left
         if direction == Creature.RIGHT:
@@ -69,6 +83,12 @@ class Creature:
             self.x = (self.x + 1) % self.world.grid_width
         elif self.d == self.W:
             self.x = (self.x - 1) % self.world.grid_width
+
+    def kill(self):
+        for creature in self.world.get_creatures_at_location(self.x, self.y):
+            if creature != self and not creature.is_dead:
+                creature.is_dead = True
+                print("KILL!")
 
     def vision(self, world):
         grass = np.zeros(9)
@@ -101,3 +121,15 @@ class Creature:
 
     def remove_from_array(self):
         self.world.creatures_array[self.x][self.y].remove(self)
+
+    def eat_meat(self, amount):
+        for creature in self.world.get_creatures_at_location(self.x, self.y):
+            if creature != self and creature.is_dead:
+                eaten = min((amount, creature.meat))
+                eaten = max((eaten, 0))
+                creature.meat -= amount
+                if creature.meat < 0:
+                    creature.remove_from_array()
+                    creature.world.creatures.remove(creature)
+                return eaten
+        return 0
