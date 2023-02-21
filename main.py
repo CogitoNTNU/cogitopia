@@ -1,5 +1,5 @@
 import random
-
+import gym
 import pygame
 
 from agent import Agent
@@ -12,6 +12,10 @@ from world.world import World, WorldSettings
 import time
 import wandb
 
+from stable_baselines3 import PPO
+from stable_baselines3.common.logger import configure
+from stable_baselines3.common.env_util import make_vec_env
+from train import TrainAgent
 
 # Grid size is the number of cells in the world
 grid_width, grid_height = (40, 20)
@@ -37,12 +41,12 @@ if __name__ == '__main__':
     agents = []
 
 
-    for _ in range(100):
-        x = random.randrange(grid_width)
-        y = random.randrange(grid_height)
-        if world.water.get_value(x, y) == 0:
-            c = world.spawn_creature(x, y, (50, 50, 50), False)
-            agents.append(TAgent(world, c))
+   # for _ in range(100):
+   #     x = random.randrange(grid_width)
+   #     y = random.randrange(grid_height)
+   #     if world.water.get_value(x, y) == 0:
+   #         c = world.spawn_creature(x, y, (50, 50, 50), False)
+   #         agents.append(TAgent(world, c))
 
    # for _ in range(100):
    #     x = random.randrange(grid_width)
@@ -50,19 +54,51 @@ if __name__ == '__main__':
    #     if world.water.get_value(x, y) == 0:
    #         c = world.spawn_creature(x, y, (100, 50, 50), False)
    #         agents.append(JAgent(world, c))
-    for _ in range(100):
-        x = random.randrange(grid_width)
-        y = random.randrange(grid_height)
-        if world.water.get_value(x, y) == 0:
-            c = world.spawn_creature(x, y, (5, 150, 5), False)
-            agents.append(BAgent(world, c))
+   # for _ in range(100):
+   #     x = random.randrange(grid_width)
+   #     y = random.randrange(grid_height)
+   #     if world.water.get_value(x, y) == 0:
+   #         c = world.spawn_creature(x, y, (5, 150, 5), False)
+   #         agents.append(BAgent(world, c))
         
-    for _ in range(100):
-        x = random.randrange(grid_width)
-        y = random.randrange(grid_height)
-        if world.water.get_value(x, y) == 0:
-            c = world.spawn_creature(x, y, (5, 150, 5), False)
-            agents.append(SauAgent(world, c))
+   # for _ in range(100):
+   #     x = random.randrange(grid_width)
+   #     y = random.randrange(grid_height)
+   #     if world.water.get_value(x, y) == 0:
+   #         c = world.spawn_creature(x, y, (5, 150, 5), False)
+   #         agents.append(SauAgent(world, c))
+    x = 5
+    y = 5
+    #if world.water.get_value(x, y) == 0:
+    c = world.spawn_creature(x, y, (5, 150, 5), False)
+    agent = TrainAgent(world, c)
+
+    #env = make_vec_env(agent, n_envs=2)
+    env = agent
+
+    new_logger = configure('./results', ["stdout", "csv", "json", "log"])
+    model = PPO("MlpPolicy", env, 1/1000, verbose=1)
+    model.set_logger(new_logger)
+    model.learn(total_timesteps=500000, log_interval=4)
+    model.save("ppo_agent1")
+
+    total_len = 0
+    num_episodes = 0
+    
+    #env = TrainAgent(render_enabled=True)
+    obs = env.reset()
+
+    while True:
+        action, _states = model.predict(obs, deterministic=False)
+        obs, _, done, _ = env.step(action)
+        
+        env.render() # Comment out this call to train faster
+
+        if done:
+            total_len += env.player.len
+            num_episodes += 1
+            obs = env.reset()
+            print('Average len: {:.1f}'.format(total_len / num_episodes))
 
 
     def reproduction_callback(parent):
