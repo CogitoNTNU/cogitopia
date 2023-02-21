@@ -8,6 +8,8 @@ from base_agent import AgentBase
 class BAgent(AgentBase):
     """Agent moving towards best grass in range"""
 
+    COLOR = (5, 150, 5)
+    IS_PREDATOR = True
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
@@ -15,7 +17,7 @@ class BAgent(AgentBase):
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         super(BAgent, self).__init__(world, creature)
-        self.creature.predator = True
+        self.creature.predator = BAgent.IS_PREDATOR
         self.vision()
         
     def step(self):

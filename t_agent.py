@@ -7,6 +7,8 @@ from base_agent import AgentBase
 class TAgent(AgentBase):
     """Agent moving towards best grass in range"""
 
+    COLOR = (50, 50, 50)
+    IS_PREDATOR = False
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
