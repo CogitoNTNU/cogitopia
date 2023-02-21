@@ -6,6 +6,7 @@ from agent import Agent
 from t_agent import TAgent
 from j_agent import JAgent
 from b_agent import BAgent
+from sau_agent import SauAgent
 from rendering import Renderer
 from world.world import World, WorldSettings
 import time
@@ -55,6 +56,14 @@ if __name__ == '__main__':
         if world.water.get_value(x, y) == 0:
             c = world.spawn_creature(x, y, (5, 150, 5), False)
             agents.append(BAgent(world, c))
+        
+    for _ in range(100):
+        x = random.randrange(grid_width)
+        y = random.randrange(grid_height)
+        if world.water.get_value(x, y) == 0:
+            c = world.spawn_creature(x, y, (5, 150, 5), False)
+            agents.append(SauAgent(world, c))
+
 
     def reproduction_callback(parent):
         c = world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
@@ -63,7 +72,7 @@ if __name__ == '__main__':
     world.reproduction_callback = reproduction_callback
 
     running = True
-    wandb.init(project="Cogitopia monitor", entity="torghauk-team", config={"growth_rate": ws.grass_growth_rate, "person": "beepboopland"})
+    wandb.init(project="Cogitopia monitor", entity="torghauk-team", config={"growth_rate": ws.grass_growth_rate, "person": "aleksos"})
     lastamount = 0
     lasttime = time.time()
     while running:
@@ -86,13 +95,15 @@ if __name__ == '__main__':
         j_agentcount = 0
         t_agentcount = 0
         b_agentcount = 0
+        sau_agentcount = 0
         for agent in agents:
             if type(agent) == JAgent and not agent.creature.is_dead: j_agentcount += 1
             if type(agent) == TAgent and not agent.creature.is_dead: t_agentcount += 1
             if type(agent) == BAgent and not agent.creature.is_dead: b_agentcount += 1
+            if type(agent) == SauAgent and not agent.creature.is_dead: sau_agentcount += 1
 
 
-        wandb.log({"time": world.get_time(),"agentdiff": len(agents)-lastamount, "agentcount": len(agents), "timeuse": time.time()-lasttime, "j_agentcount": j_agentcount, "t_agentcount": t_agentcount, "b_agentcount": b_agentcount})
+        wandb.log({"time": world.get_time(),"agentdiff": len(agents)-lastamount, "agentcount": len(agents), "timeuse": time.time()-lasttime, "j_agentcount": j_agentcount, "t_agentcount": t_agentcount, "b_agentcount": b_agentcount, "Sau_agentcount": sau_agentcount})
         lasttime = time.time()
         lastamount = len(agents)
         # Render everything and display
