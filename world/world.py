@@ -13,6 +13,7 @@ from .height import Height
 from .water import Water
 from .sun import Sun
 from .creature import Creature
+from .smell import Smell
 
 
 # WorldSettings should have all constants that
@@ -54,6 +55,7 @@ class World:
         self.grid_height = grid_height
         self.grass = Grass(self.grid_width, self.grid_height, self.initialize(), self)
         self.earth = Earth(self.grid_width, self.grid_height, self.initialize(), self)
+        self.smell = Smell(self.grid_width, self.grid_height, self.initialize(1), self)
         self.temperature = Temperature(self.grid_width, self.grid_height, self.initialize(), self)
         self.height = Height(self.grid_width, self.grid_height, self.initialize(1), self)
         self.water = Water(self.grid_width, self.grid_height, self.height, self)
@@ -78,6 +80,7 @@ class World:
 
         self.grass.step()
         self.earth.step()
+        self.smell.step()
         if self.settings.use_temp:
             self.temperature.step()
         self.sun.step(self.time)
