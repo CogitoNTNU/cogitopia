@@ -4,6 +4,8 @@ import numpy as np
 
 from math import log2
 
+import world.smell
+
 
 class Creature:
     N, E, S, W = range(4)
@@ -104,6 +106,7 @@ class Creature:
                 eaten = min((amount, creature.meat))
                 eaten = max((eaten, 0))
                 creature.meat -= amount
+                #world.smell.
                 if creature.meat < 0:
                     creature.remove_from_array()
                     creature.world.creatures.remove(creature)
