@@ -14,14 +14,15 @@ class TrainAgent(AgentBase):
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.other_creatures = [[[] for _ in range(self.vision_range * 2 +1)] for _ in range(self.vision_range * 2 + 1)]
+        self.action = 0
         creature.color=(255,255,255)
         super(TrainAgent, self).__init__(world, creature)
 
-    #def step(self):
-    #    """Runs through logic to decide next action."""
-    #    
-    #    valid = self.creature.request_action(action)
-    #    assert valid, 'Invalid action!'
+    def step(self):
+        """Runs through logic to decide next action."""
+
+        valid = self.creature.request_action(self.action)
+        assert valid, 'Invalid action!'
 
     def tick(self):
         survive = True
