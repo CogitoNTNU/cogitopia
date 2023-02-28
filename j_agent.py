@@ -7,13 +7,15 @@ class JAgent(AgentBase):
     """Agent moving towards best grass in range"""
 
     OWN_POS = 0, 0
+    COLOR = (100, 50, 50)
+    IS_PREDATOR = False
 
     def __init__(self, world, creature):
         self.vision_range = 3
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         super(JAgent, self).__init__(world, creature)
-        
+
     def step(self):
         """Runs through logic to decide next action."""
         action = self.logic()
@@ -75,3 +77,7 @@ class JAgent(AgentBase):
             for j in range(-self.vision_range, self.vision_range + 1):
                 self.grass[self.vision_range + i][self.vision_range + j] = self.get_grass((i, j))
                 self.walkable[self.vision_range + i][self.vision_range + j] = self.is_walkable((i, j))
+
+    @staticmethod
+    def get_color():
+        return JAgent.Color
