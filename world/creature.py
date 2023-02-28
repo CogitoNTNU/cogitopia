@@ -4,7 +4,7 @@ import numpy as np
 
 from math import log2
 
-import world.smell
+import world
 
 
 class Creature:
@@ -27,6 +27,7 @@ class Creature:
         self.agent_type = None
         Creature.ID_COUNTER += 1
         self.predator = predator
+        self.smell = False
 
     def request_action(self, action):
         if action in range(8):
@@ -37,6 +38,9 @@ class Creature:
     def process_action(self):
 
         if self.is_dead:
+            if not self.smell:
+                self.world.smell.create_smell(self.x, self.y)
+                self.smell = True
             return
         if self.action_buffer == Creature.EAT:
             if self.predator:
@@ -106,7 +110,6 @@ class Creature:
                 eaten = min((amount, creature.meat))
                 eaten = max((eaten, 0))
                 creature.meat -= amount
-                #world.smell.
                 if creature.meat < 0:
                     creature.remove_from_array()
                     creature.world.creatures.remove(creature)

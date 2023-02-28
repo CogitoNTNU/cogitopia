@@ -9,8 +9,10 @@ class Smell(Layer):
         self.grid.fill(0)
         self.grid[5, 5] = 1
 
+    def create_smell(self,x_pos,y_pos):
+        self.grid[x_pos, y_pos] = 1
+
     def step(self):
-        #self.grid[5,5] = 1
         temp_grid = self.grid.copy()
         self.grid += np.roll(self.grid,1)*0.01
         self.grid -= temp_grid*0.01
