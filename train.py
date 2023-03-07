@@ -10,10 +10,10 @@ class TrainAgent(AgentBase):
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
-        self.vision_range = 1
+        self.vision_range = 3
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
-        self.other_creatures = [[[] for _ in range(self.vision_range * 2 +1)] for _ in range(self.vision_range * 2 + 1)]
+        self.other_creatures = np.array([np.array([len([]) for _ in range(self.vision_range * 2 +1)]) for _ in range(self.vision_range * 2 + 1)])
         self.action = 0
         creature.color=(255,255,255)
         super(TrainAgent, self).__init__(world, creature)
@@ -131,14 +131,48 @@ class TrainAgent(AgentBase):
         """Gets creatures in vision range"""
         x_pos = (self.creature.x + pos[0]) % self.world.grid_width
         y_pos = (self.creature.y + pos[1]) % self.world.grid_height
-        return self.world.creatures_array[x_pos][y_pos]
+        return len(self.world.creatures_array[x_pos][y_pos])
+
+    def check_grid(self, grid):
+        out = None
+        if self.creature.y - self.vision_range < 0 and self.creature.x - self.vision_range < 0:
+            out = grid[
+                  (self.creature.x + self.vision_range + 1) % self.world.grid_width:
+                  self.creature.x - self.vision_range,
+                  (self.creature.y + self.vision_range + 1) % self.world.grid_height:
+                  self.creature.y - self.vision_range]
+        elif self.creature.y - self.vision_range < 0:
+            out = grid[
+                  self.creature.x - self.vision_range:
+                  (self.creature.x + self.vision_range + 1) % self.world.grid_width,
+                  (self.creature.y + self.vision_range + 1) % self.world.grid_height:
+                  self.creature.y - self.vision_range]
+        elif self.creature.x - self.vision_range < 0:
+            out = grid[
+                  (self.creature.x + self.vision_range + 1) % self.world.grid_width:
+                  self.creature.x - self.vision_range,
+                  self.creature.y - self.vision_range:
+                  (self.creature.y + self.vision_range + 1) % self.world.grid_height]
+        else:
+            out = grid[
+                  self.creature.x - self.vision_range:
+                  (self.creature.x + self.vision_range + 1) % self.world.grid_width,
+                  self.creature.y - self.vision_range:
+                  (self.creature.y + self.vision_range + 1) % self.world.grid_height]
+        if not out.shape == np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1)).shape:
+            out = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
+        return out
 
     def vision(self):
         """Finds grass in vision range, and finds walkable tiles."""
+        self.grass = self.check_grid(self.world.grass.grid)
+        self.walkable = np.equal(self.check_grid(self.world.water.grid), 0)
+
+        # exit()
         for i in range(-self.vision_range, self.vision_range + 1):
             for j in range(-self.vision_range, self.vision_range + 1):
-                self.grass[self.vision_range + i][self.vision_range + j] = self.get_grass((i, j))
-                self.walkable[self.vision_range + i][self.vision_range + j] = self.is_walkable((i, j))
+                #        #self.grass[self.vision_range + i][self.vision_range + j] = self.get_grass((i, j))
+                #        self.walkable[self.vision_range + i][self.vision_range + j] = self.is_walkable((i, j))
                 self.other_creatures[self.vision_range + i][self.vision_range + j] = self.get_creatures((i, j))
 
             
