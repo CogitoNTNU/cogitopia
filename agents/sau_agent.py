@@ -1,7 +1,7 @@
 """A very laggy sheep"""
 import numpy as np
 from world.creature import Creature
-from base_agent import AgentBase
+from .base_agent import AgentBase
 
 
 class SauAgent(AgentBase):

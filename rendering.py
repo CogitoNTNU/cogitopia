@@ -18,6 +18,7 @@ class Renderer:
         self.draw_layer(self.world.grass)
         self.draw_layer(self.world.water)
         self.draw_sun()
+        
         for c in self.world.creatures:
             self.draw_creature(c)
 
