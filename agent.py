@@ -1,8 +1,9 @@
 from world.creature import Creature
 import numpy as np
 from base_agent import AgentBase
+import gym
 
-class Agent(AgentBase):
+class Agent(AgentBase, gym.Env):
     def __init__(self, world, creature):
         super(Agent, self).__init__(world, creature)
         
