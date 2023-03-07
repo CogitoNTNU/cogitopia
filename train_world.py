@@ -6,11 +6,12 @@ import numpy as np
 from perlin_noise import PerlinNoise
 import yaml
 
-from .world import World
+from world.world import World
 from world.world import WorldSettings as WorldSettings
-from .creature import Creature
-from train import TrainAgent
+from world.creature import Creature
+from agents.train import TrainAgent
 from stable_baselines3 import PPO
+
 #import random
 #import sys
 #from collections import deque

@@ -1,6 +1,6 @@
 from world.creature import Creature
 import numpy as np
-from base_agent import AgentBase
+from .base_agent import AgentBase
 import gym
 
 class Agent(AgentBase, gym.Env):
