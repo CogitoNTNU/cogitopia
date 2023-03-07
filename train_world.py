@@ -2,7 +2,13 @@
 Module representing the world.
 """
 from random import randint
+
+import git
 import numpy as np
+from stable_baselines3.common.vec_env import VecMonitor
+from wandb.integration.sb3 import WandbCallback
+
+import wandb
 from perlin_noise import PerlinNoise
 import yaml
 
@@ -12,7 +18,7 @@ from world.creature import Creature
 from agents.train import TrainAgent
 from stable_baselines3 import PPO
 
-#import random
+import random
 #import sys
 #from collections import deque
 from gym import spaces
@@ -30,7 +36,7 @@ import gym
 class TrainWorld(gym.Env):
     def __init__(self):
         self.world = World(grid_width=40, grid_height=20, settings=WorldSettings())
-        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), False)
+        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), True)
         self.player = TrainAgent(self.world, self.creature)
         self.action_space = spaces.Discrete(8)
         self.observation_space = spaces.Box(low=0, high=1, shape=(4, self.player.vision_range*2+1, self.player.vision_range*2+1))
@@ -44,7 +50,7 @@ class TrainWorld(gym.Env):
             c = self.world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
             self.agents.append(parent.agent_type(self.world, c))
             return True
-        self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), True)))
+        self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), False)))
         self.world.reproduction_callback = reproduction_callback
 
     def spawn_creature(self, x_pos, y_pos, color, predator):
@@ -58,7 +64,7 @@ class TrainWorld(gym.Env):
 
     def reset(self):
         self.world = World(grid_width=40, grid_height=20, settings=WorldSettings())
-        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), False)
+        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), True)
         self.player = TrainAgent(self.world, self.creature)
         self.world_age = 1
         self.agents = []
@@ -66,7 +72,7 @@ class TrainWorld(gym.Env):
             c = self.world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
             self.agents.append(parent.agent_type(self.world, c))
             return True
-        self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), True)))
+        self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), False)))
         self.world.reproduction_callback = reproduction_callback
         return self.init_state()
 
@@ -107,3 +113,40 @@ class TrainWorld(gym.Env):
         if(self.world_age%100 == 0):
             print(self.world_age, len(self.agents))
         return state, reward, done, info
+
+
+
+if __name__=="__main__":
+    from stable_baselines3.common.logger import configure
+    from stable_baselines3.common.env_util import make_vec_env
+    ws = WorldSettings()
+    # Grid size is the number of cells in the world
+    grid_width, grid_height = (ws.grid_width, ws.grid_height)
+
+    # Scale is the pixel size of each world cell on screen
+    scale = ws.scale
+
+    # Get git commit hash
+    repo = git.Repo(search_parent_directories=True)
+    sha = repo.head.object.hexsha
+
+    trainrun = wandb.init(project="Cogitopia ppovision",
+                          entity="torghauk-team",
+                          sync_tensorboard=True,
+                          config={"growth_rate": ws.grass_growth_rate,
+                                  "git_hash": sha,
+                                  "world_settings": ws.settings})
+
+    env = make_vec_env(TrainWorld, n_envs=2)
+    env = VecMonitor(env)
+    # env = agent
+
+    model = PPO("MlpPolicy", env, 1/50000, verbose=1, tensorboard_log="./tmp/tensorlog/")
+    model.set_parameters("ppo_agent3.zip")
+    model.learn(total_timesteps=50000, log_interval=4,
+                callback=WandbCallback(
+                    gradient_save_freq=1000,
+                    verbose=2,
+                    log="all"
+                ))
+    model.save("ppo_agent3")

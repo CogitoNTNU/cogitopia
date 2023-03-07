@@ -1,28 +1,20 @@
 import random
-import gym
 import time
 import git
 import pygame
 import wandb
-from wandb.integration.sb3 import WandbCallback
 
 from agents.t_agent import TAgent
 from agents.j_agent import JAgent
 from agents.b_agent import BAgent
 from agents.sau_agent import SauAgent
-from ppo_agent import PPOAgent, PPOAgentPred
+from agents.ppo_agent import PPOAgent, PPOAgentPred
 from rendering import Renderer
 from world.world import World, WorldSettings
-from stable_baselines3.common.vec_env import VecMonitor
 
 if __name__ == '__main__':
     ws = WorldSettings()
 
-from stable_baselines3 import PPO
-from stable_baselines3.common.logger import configure
-from stable_baselines3.common.env_util import make_vec_env
-from agents.train import TrainAgent
-from train_world import TrainWorld
 
 # Grid size is the number of cells in the world
 grid_width, grid_height = (ws.grid_width, ws.grid_height)
@@ -43,13 +35,6 @@ agents = []
 repo = git.Repo(search_parent_directories=True)
 sha = repo.head.object.hexsha
 
-trainrun = wandb.init(project="Cogitopia ppovision",
-           entity="torghauk-team",
-                      sync_tensorboard=True,
-           config={"growth_rate": ws.grass_growth_rate,
-                   "git_hash": sha,
-                   "world_settings": ws.settings})
-
 def spawn(amount, agent_type):
     for _ in range(amount):
         x_pos = random.randrange(grid_width)
@@ -57,24 +42,8 @@ def spawn(amount, agent_type):
         if world.water.get_value(x_pos, y_pos) == 0:
             creature = world.spawn_creature(x_pos, y_pos, agent_type.COLOR, agent_type.IS_PREDATOR)
             agents.append(agent_type(world, creature))
-env = make_vec_env(TrainWorld, n_envs=2)
-env = VecMonitor(env)
-#env = agent
 
 
-new_logger = configure('./results', ["stdout", "csv", "json", "log"])
-#model = PPO("MlpPolicy", env, 1/50000, verbose=1)
-#model.set_parameters("ppo_agent2.zip")
-#model.set_logger(new_logger)
-#model.learn(total_timesteps=500, log_interval=4,
-#            callback=WandbCallback(
-#                gradient_save_freq=1000,
-#                verbose=2,
-#                log="all"
-#            ))
-#model.save("ppo_agent2")
-
-trainrun.finish()
 total_len = 0
 num_episodes = 0
 spawn(ws.j_agent_amount, JAgent)
@@ -82,7 +51,6 @@ spawn(ws.t_agent_amount, TAgent)
 spawn(ws.b_agent_amount, BAgent)
 spawn(20, PPOAgent)
 spawn(20, PPOAgentPred)
-obs = env.reset()
 
 def reproduction_callback(parent):
     c = world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
