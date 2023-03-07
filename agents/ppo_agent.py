@@ -195,7 +195,7 @@ class PPOAgentPred(AgentBase):
         self.other_creatures = np.array(
             [np.array([len([]) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
         self.action = 0
-        self.model = PPO.load("ppo_agent3.zip")
+        self.model = PPO.load("ppo_agent4.zip")
         creature.color = (255, 255, 255)
         super(PPOAgentPred, self).__init__(world, creature)
 

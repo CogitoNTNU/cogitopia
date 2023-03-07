@@ -69,6 +69,7 @@ wandb.init(project="Cogitopia monitor",
 
 lastamount = 0
 lasttime = time.time()
+lastamount = len(agents)
 while running:
     # Process input
     for event in pygame.event.get():
