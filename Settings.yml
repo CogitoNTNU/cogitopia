@@ -1,15 +1,16 @@
 grid_width : 40
 grid_height : 20
-scale : 32
+scale : 16
 use_temp : True
-grass_growth_rate : 1
+grass_growth_rate : 0.5
 t_agent_amount: 100
 j_agent_amount: 100
 b_agent_amount: 100
 clock_speed : 0
 creature_starting_food : 0.4
-turning_food_cost: 0.0005
-walking_food_cost : 0.002
+turning_food_cost: 0.003
+walking_food_cost : 0.005
+base_food_cost: 0.002
 walking_in_water_cost : 0.008
 reproduction_cost : 0.5
 killing_cost : 0.2

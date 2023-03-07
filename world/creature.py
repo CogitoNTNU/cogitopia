@@ -65,7 +65,7 @@ class Creature:
                 self.kill()
                 self.food -= self.world.settings.killing_cost
 
-        self.food -= 0.0002
+        self.food -= self.world.settings.base_food_cost
         self.action_buffer = None
 
     def turn(self, direction):  # direction 0 = right, 1 = left

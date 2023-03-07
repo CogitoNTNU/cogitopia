@@ -20,12 +20,12 @@ from .creature import Creature
 
 class WorldSettings:
     """Global settings."""
-    with open("Settings.yml", "r") as stream:
+    with open("settings.yml", "r") as stream:
         try:
             settings = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
-
+    
     use_temp = settings["use_temp"]
     grass_growth_rate = settings["grass_growth_rate"]
     scale = settings["scale"]
@@ -38,6 +38,7 @@ class WorldSettings:
     creature_starting_food = settings["creature_starting_food"]
     turning_food_cost = settings["turning_food_cost"]
     walking_food_cost = settings["walking_food_cost"]
+    base_food_cost = settings["base_food_cost"]
     walking_in_water_cost = settings["walking_in_water_cost"]
     reproduction_cost = settings["reproduction_cost"]
     killing_cost = settings["killing_cost"]
