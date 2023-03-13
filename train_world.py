@@ -5,7 +5,7 @@ from random import randint
 
 import git
 import numpy as np
-from stable_baselines3.common.vec_env import VecMonitor
+from stable_baselines3.common.vec_env import VecMonitor, SubprocVecEnv
 from wandb.integration.sb3 import WandbCallback
 
 import wandb
@@ -39,7 +39,7 @@ class TrainWorld(gym.Env):
         self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), True)
         self.player = TrainAgent(self.world, self.creature)
         self.action_space = spaces.Discrete(8)
-        self.observation_space = spaces.Box(low=0, high=1, shape=(4, self.player.vision_range*2+1, self.player.vision_range*2+1))
+        self.observation_space = spaces.Box(low=0, high=1, shape=(5, self.player.vision_range*2+1, self.player.vision_range*2+1))
         self.world_age = 1
         self.callback = None
         self.agents = []
@@ -60,11 +60,12 @@ class TrainWorld(gym.Env):
         return creature
 
     def init_state(self):
-        return np.zeros(shape=(4, self.player.vision_range*2+1, self.player.vision_range*2+1))
+        return np.zeros(shape=(5, self.player.vision_range*2+1, self.player.vision_range*2+1))
 
     def reset(self):
         self.world = World(grid_width=40, grid_height=20, settings=WorldSettings())
         self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), True)
+        self.predatormodel = PPO.load(path="ppo_agent3.zip")
         self.player = TrainAgent(self.world, self.creature)
         self.world_age = 1
         self.agents = []
@@ -79,7 +80,7 @@ class TrainWorld(gym.Env):
     def step(self, action):
         self.player.vision()
         food_0 = self.creature.food
-        state = np.stack((np.array(self.player.grass), np.array(self.player.walkable), np.array(self.player.other_creatures), np.ones((self.player.vision_range*2+1, self.player.vision_range*2+1))*food_0))
+        state = np.stack((np.array(self.player.grass), np.array(self.player.walkable), np.array(self.player.other_creatures), np.array(self.player.other_dead_creatures), np.ones((self.player.vision_range*2+1, self.player.vision_range*2+1))*food_0))
         reward = 0
         done = False
         info = {}
@@ -99,6 +100,9 @@ class TrainWorld(gym.Env):
                               np.ones((agent.vision_range * 2 + 1, agent.vision_range * 2 + 1)) * agent.creature.food))
 
             if agent.creature.predator:
+                agentstate = np.stack((np.array(agent.grass), np.array(agent.walkable), np.array(agent.other_creatures), np.array(agent.other_dead_creatures),
+                                       np.ones((agent.vision_range * 2 + 1,
+                                                agent.vision_range * 2 + 1)) * agent.creature.food))
                 action, _states = self.predatormodel.predict(agentstate, deterministic=False)
             else:
                 action, _states = self.model.predict(agentstate, deterministic=False)
@@ -108,15 +112,15 @@ class TrainWorld(gym.Env):
 
 
         # Death
-        reward += self.creature.food - food_0 + len(list(filter(lambda x: x.creature.predator, self.agents)))*(np.log2(self.world_age)-5)
+        reward += len(list(filter(lambda x: x.creature.predator, self.agents)))*7 + self.world.murders
         survive = self.player.tick()
         if not survive:
-            reward = -1000+self.world_age
-            print("dead", self.world_age, len(self.agents))
+            reward = -1000 + self.world_age/3
+            #print("dead", self.world_age, len(self.agents))
             done = True
-        done = self.world_age > 1500 or done or len(self.agents) > 3000
-        if(self.world_age%100 == 0):
-            print(self.world_age, len(self.agents))
+        done = done or len(list(filter(lambda x: x.creature.predator, self.agents))) > 2048 or self.world_age > 3000
+        if(self.world_age%500 == 0):
+            print(self.world_age, len(self.agents), len(list(filter(lambda x: x.creature.predator, self.agents))))
         return state, reward, done, info
 
 
@@ -135,24 +139,28 @@ if __name__=="__main__":
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
 
+
+
+    env = make_vec_env(TrainWorld, n_envs=20, vec_env_cls=SubprocVecEnv)
+    env = VecMonitor(env)
+    # env = agent
+    model = PPO("MlpPolicy", env, 1/15000, batch_size=20*2048, verbose=1, tensorboard_log="./tmp/tensorlog/", n_epochs=30)
+    model.set_parameters("ppo_agent3.zip")
+    wandb.tensorboard.patch(root_logdir="./tmp/tensorlog/")
     trainrun = wandb.init(project="Cogitopia ppovision",
                           entity="torghauk-team",
                           sync_tensorboard=True,
                           config={"growth_rate": ws.grass_growth_rate,
                                   "git_hash": sha,
                                   "world_settings": ws.settings})
-
-    env = make_vec_env(TrainWorld, n_envs=2)
-    env = VecMonitor(env)
-    # env = agent
-
-    model = PPO("MlpPolicy", env, 1/15000, verbose=1, tensorboard_log="./tmp/tensorlog/")
-    model.set_parameters("ppo_agent3.zip")
-    model.learn(total_timesteps=50000, log_interval=2,
-                callback=WandbCallback(
-                    gradient_save_freq=1000,
-                    verbose=2,
-                    log="all"
-                ))
+    for i in range(0,31):
+        model.learning_rate = 1/(75)
+        model.learn(total_timesteps=220000, log_interval=1, progress_bar=True,
+                    callback=WandbCallback(
+                        gradient_save_freq=1000,
+                        verbose=2,
+                        log="all"
+                    ))
+        model.save("ppo_agent3")
     trainrun.finish()
-    model.save("ppo_agent4")
+

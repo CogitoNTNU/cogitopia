@@ -35,6 +35,9 @@ class Creature:
     def process_action(self):
 
         if self.is_dead:
+            if self.meat < 0:
+                self.remove_from_array()
+                self.world.creatures.remove(self)
             return
         if self.action_buffer == Creature.EAT:
             if self.predator:

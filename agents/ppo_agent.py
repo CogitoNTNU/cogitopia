@@ -8,7 +8,7 @@ from stable_baselines3 import PPO
 
 class PPOAgent(AgentBase):
     IS_PREDATOR = False
-    COLOR = (255,0,0)
+    COLOR = (0,0,255)
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
@@ -19,7 +19,6 @@ class PPOAgent(AgentBase):
             [np.array([len([]) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
         self.action = 0
         self.model = PPO.load("ppo_agent2")
-        creature.color = (255, 255, 255)
         super(PPOAgent, self).__init__(world, creature)
 
     def step(self):
@@ -185,7 +184,7 @@ class PPOAgent(AgentBase):
 
 class PPOAgentPred(AgentBase):
     IS_PREDATOR = True
-    COLOR = (128,0,128)
+    COLOR = (180,0,190)
     OWN_POS = 0, 0
 
     def __init__(self, world, creature):
@@ -194,15 +193,16 @@ class PPOAgentPred(AgentBase):
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.other_creatures = np.array(
             [np.array([len([]) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
+        self.other_dead_creatures = np.array(
+            [np.array([len(list(filter(lambda x: x.is_dead, []))) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
         self.action = 0
-        self.model = PPO.load("ppo_agent4.zip")
-        creature.color = (255, 255, 255)
+        self.model = PPO.load("ppo_agent3.zip")
         super(PPOAgentPred, self).__init__(world, creature)
 
     def step(self):
         """Runs through logic to decide next action."""
         self.vision()
-        agentstate = np.stack((np.array(self.grass), np.array(self.walkable), np.array(self.other_creatures),
+        agentstate = np.stack((np.array(self.grass), np.array(self.walkable), np.array(self.other_creatures), np.array(self.other_dead_creatures),
                                np.ones((self.vision_range * 2 + 1, self.vision_range * 2 + 1)) * self.creature.food))
         self.action, _ = self.model.predict(agentstate)
         valid = self.creature.request_action(self.action)
@@ -316,6 +316,12 @@ class PPOAgentPred(AgentBase):
         y_pos = (self.creature.y + pos[1]) % self.world.grid_height
         return len(self.world.creatures_array[x_pos][y_pos])
 
+    def get_dead_creatures(self, pos):
+        """Gets creatures in vision range"""
+        x_pos = (self.creature.x + pos[0]) % self.world.grid_width
+        y_pos = (self.creature.y + pos[1]) % self.world.grid_height
+        return len(list(filter(lambda x: x.is_dead, self.world.creatures_array[x_pos][y_pos])))
+
     def check_grid(self, grid):
         out = None
         if self.creature.y - self.vision_range < 0 and self.creature.x - self.vision_range < 0:
@@ -357,6 +363,7 @@ class PPOAgentPred(AgentBase):
                 #        #self.grass[self.vision_range + i][self.vision_range + j] = self.get_grass((i, j))
                 #        self.walkable[self.vision_range + i][self.vision_range + j] = self.is_walkable((i, j))
                 self.other_creatures[self.vision_range + i][self.vision_range + j] = self.get_creatures((i, j))
+                self.other_dead_creatures[self.vision_range + i][self.vision_range + j] = self.get_dead_creatures((i, j))
 
 
 

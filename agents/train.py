@@ -14,6 +14,7 @@ class TrainAgent(AgentBase):
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.other_creatures = np.array([np.array([len([]) for _ in range(self.vision_range * 2 +1)]) for _ in range(self.vision_range * 2 + 1)])
+        self.other_dead_creatures = np.array([np.array([len(list(filter(lambda x: x.is_dead, []))) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
         self.action = 0
         creature.color=(255,255,255)
         super(TrainAgent, self).__init__(world, creature)
@@ -133,6 +134,12 @@ class TrainAgent(AgentBase):
         y_pos = (self.creature.y + pos[1]) % self.world.grid_height
         return len(self.world.creatures_array[x_pos][y_pos])
 
+    def get_dead_creatures(self, pos):
+        """Gets creatures in vision range"""
+        x_pos = (self.creature.x + pos[0]) % self.world.grid_width
+        y_pos = (self.creature.y + pos[1]) % self.world.grid_height
+        return len(list(filter(lambda x: x.is_dead, self.world.creatures_array[x_pos][y_pos])))
+
     def check_grid(self, grid):
         out = None
         if self.creature.y - self.vision_range < 0 and self.creature.x - self.vision_range < 0:
@@ -174,6 +181,8 @@ class TrainAgent(AgentBase):
                 #        #self.grass[self.vision_range + i][self.vision_range + j] = self.get_grass((i, j))
                 #        self.walkable[self.vision_range + i][self.vision_range + j] = self.is_walkable((i, j))
                 self.other_creatures[self.vision_range + i][self.vision_range + j] = self.get_creatures((i, j))
+                self.other_dead_creatures[self.vision_range + i][self.vision_range + j] = self.get_dead_creatures((i, j))
+
 
             
 
