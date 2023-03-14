@@ -46,7 +46,7 @@ class Renderer:
         for x in range(self.grid_width):
             for y in range(self.grid_height):
                 test = pygame.Surface((self.scale, self.scale))
-                test.set_alpha( 100 * (self.world.height.grid[x][y]))
+                test.set_alpha( 244 * (self.world.height.grid[x][y]))
                 self.screen.blit(test, (x * self.scale, y * self.scale))
 
 

@@ -47,7 +47,6 @@ class Clouds(Layer):
 
 
         self.grid -= 0.0012  # 0.012
-        #self.grid = np.heaviside(self.grid-0.1,0)
         self.grid = np.clip(self.grid, 0, 1)
 
 
@@ -60,4 +59,4 @@ class Clouds(Layer):
 
     @staticmethod
     def get_color(value):
-        return 140+100*value, 140+100*value, 140+100*value
+        return 140+100*(0.5-value), 140+100*(0.5-value), 140+100*(0.5-value)
