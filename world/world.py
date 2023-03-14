@@ -5,7 +5,7 @@ from random import randint
 import numpy as np
 from perlin_noise import PerlinNoise
 import yaml
-
+from .clouds import Clouds
 from .earth import Earth
 from .grass import Grass
 from .temperature import Temperature
@@ -56,6 +56,7 @@ class World:
         self.grass = Grass(self.grid_width, self.grid_height, self.initialize(), self)
         self.earth = Earth(self.grid_width, self.grid_height, self.initialize(), self)
         self.smell = Smell(self.grid_width, self.grid_height, self.initialize(1), self)
+        self.clouds = Clouds(self.grid_width, self.grid_height, self.initialize(1), self)
         self.temperature = Temperature(self.grid_width, self.grid_height, self.initialize(), self)
         self.height = Height(self.grid_width, self.grid_height, self.initialize(1), self)
         self.water = Water(self.grid_width, self.grid_height, self.height, self)
@@ -81,6 +82,7 @@ class World:
         self.grass.step()
         self.earth.step()
         self.smell.step()
+        self.clouds.step()
         if self.settings.use_temp:
             self.temperature.step()
         self.sun.step(self.time)
