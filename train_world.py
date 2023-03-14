@@ -7,6 +7,8 @@ import git
 import numpy as np
 from stable_baselines3.common.vec_env import VecMonitor, SubprocVecEnv
 from wandb.integration.sb3 import WandbCallback
+import torch as th
+import torch.nn as nn
 
 import wandb
 from perlin_noise import PerlinNoise
@@ -17,7 +19,8 @@ from world.world import WorldSettings as WorldSettings
 from world.creature import Creature
 from agents.train import TrainAgent
 from stable_baselines3 import PPO
-
+from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+import agents.t_agent
 import random
 #import sys
 #from collections import deque
@@ -36,21 +39,21 @@ import gym
 class TrainWorld(gym.Env):
     def __init__(self):
         self.world = World(grid_width=40, grid_height=20, settings=WorldSettings())
-        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), True)
+        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), False)
         self.player = TrainAgent(self.world, self.creature)
         self.action_space = spaces.Discrete(8)
         self.observation_space = spaces.Box(low=0, high=1, shape=(5, self.player.vision_range*2+1, self.player.vision_range*2+1))
         self.world_age = 1
         self.callback = None
         self.agents = []
-        self.model = PPO.load(path="ppo_agent2.zip")
+        self.model = PPO.load(path="ppo_agent4.zip")
         self.predatormodel = PPO.load(path="ppo_agent4.zip")
 
         def reproduction_callback(parent):
             c = self.world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
             self.agents.append(parent.agent_type(self.world, c))
             return True
-        for i in range(25): self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), False)))
+        for i in range(25): self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), True)))
         self.world.reproduction_callback = reproduction_callback
 
     def spawn_creature(self, x_pos, y_pos, color, predator):
@@ -64,7 +67,7 @@ class TrainWorld(gym.Env):
 
     def reset(self):
         self.world = World(grid_width=40, grid_height=20, settings=WorldSettings())
-        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), True)
+        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), False)
         self.predatormodel = PPO.load(path="ppo_agent4.zip")
         self.player = TrainAgent(self.world, self.creature)
         self.world_age = 1
@@ -73,7 +76,7 @@ class TrainWorld(gym.Env):
             c = self.world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
             self.agents.append(parent.agent_type(self.world, c))
             return True
-        for i in range(25): self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), False)))
+        for i in range(25): self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), True)))
         self.world.reproduction_callback = reproduction_callback
         return self.init_state()
 
@@ -96,9 +99,10 @@ class TrainWorld(gym.Env):
                 # world.creatures.remove(agent.creature)
                 continue
             agent.vision()
-            agentstate = np.stack((np.array(agent.grass), np.array(agent.walkable),np.array(agent.other_creatures),
-                              np.ones((agent.vision_range * 2 + 1, agent.vision_range * 2 + 1)) * agent.creature.food))
-
+            agentstate = np.stack((np.array(agent.grass), np.array(agent.walkable), np.array(agent.other_creatures),
+                                   np.array(agent.other_dead_creatures),
+                                   np.ones((agent.vision_range * 2 + 1,
+                                            agent.vision_range * 2 + 1)) * agent.creature.food))
             if agent.creature.predator:
                 agentstate = np.stack((np.array(agent.grass), np.array(agent.walkable), np.array(agent.other_creatures), np.array(agent.other_dead_creatures),
                                        np.ones((agent.vision_range * 2 + 1,
@@ -112,10 +116,10 @@ class TrainWorld(gym.Env):
 
 
         # Death
-        reward += len(list(filter(lambda x: x.creature.predator, self.agents)))*7 + self.world.murders
+        reward += len(list(filter(lambda x: x.creature.predator, self.agents)))*0.7#len(list(filter(lambda x: x.creature.predator, self.agents)))*17 + self.world.murders
         survive = self.player.tick()
         if not survive:
-            reward = (-1000 + self.world_age/3)*0.1
+            reward = (-1000 + self.world_age/3)*01.03
             #print("dead", self.world_age, len(self.agents))
             done = True
         done = done or len(list(filter(lambda x: x.creature.predator, self.agents))) > 2048 or self.world_age > 3000
@@ -124,6 +128,37 @@ class TrainWorld(gym.Env):
         return state, reward, done, info
 
 
+
+class CustomCNN(BaseFeaturesExtractor):
+    """
+    :param observation_space: (gym.Space)
+    :param features_dim: (int) Number of features extracted.
+        This corresponds to the number of unit for the last layer.
+    """
+
+    def __init__(self, observation_space: gym.spaces.Box, features_dim: int = 256):
+        super(CustomCNN, self).__init__(observation_space, features_dim)
+        # We assume CxHxW images (channels first)
+        # Re-ordering will be done by pre-preprocessing or wrapper
+        n_input_channels = observation_space.shape[0]
+        self.cnn = nn.Sequential(
+            nn.Conv2d(n_input_channels, 32, kernel_size=3, stride=3, padding=0),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=2, stride=2, padding=0),
+            nn.ReLU(),
+            nn.Flatten(),
+        )
+
+        # Compute shape by doing one forward pass
+        with th.no_grad():
+            n_flatten = self.cnn(
+                th.as_tensor(observation_space.sample()[None]).float()
+            ).shape[1]
+
+        self.linear = nn.Sequential(nn.Linear(n_flatten, features_dim), nn.ReLU())
+
+    def forward(self, observations: th.Tensor) -> th.Tensor:
+        return self.linear(self.cnn(observations))
 
 if __name__=="__main__":
     from stable_baselines3.common.logger import configure
@@ -141,10 +176,14 @@ if __name__=="__main__":
 
 
 
-    env = make_vec_env(TrainWorld, n_envs=20, vec_env_cls=SubprocVecEnv)
+    env = make_vec_env(TrainWorld, n_envs=12, vec_env_cls=SubprocVecEnv)
     env = VecMonitor(env)
     # env = agent
-    model = PPO("MlpPolicy", env, 1/500, batch_size=20*2048, verbose=1, tensorboard_log="./tmp/tensorlog/", n_epochs=30)
+    policy_kwargs = dict(
+        features_extractor_class=CustomCNN,
+        features_extractor_kwargs=dict(features_dim=128),
+    )
+    model = PPO("CnnPolicy", env, 1/500, batch_size=12*2048, policy_kwargs=policy_kwargs, verbose=1, tensorboard_log="./tmp/tensorlog/", n_epochs=30)
     #model.set_parameters("ppo_agent3.zip")
     wandb.tensorboard.patch(root_logdir="./tmp/tensorlog/")
     trainrun = wandb.init(project="Cogitopia ppovision",
@@ -155,12 +194,12 @@ if __name__=="__main__":
                                   "world_settings": ws.settings})
     for i in range(0,31):
         model.learning_rate = 1/(75)
-        model.learn(total_timesteps=420000, log_interval=1, progress_bar=True,
+        model.learn(total_timesteps=420000, log_interval=1, progress_bar=False,
                     callback=WandbCallback(
                         gradient_save_freq=1000,
                         verbose=2,
                         log="all"
                     ))
-        model.save("ppo_agent4")
+        model.save("ppo_agent2")
     trainrun.finish()
 

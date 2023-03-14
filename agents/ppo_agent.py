@@ -17,6 +17,9 @@ class PPOAgent(AgentBase):
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.other_creatures = np.array(
             [np.array([len([]) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
+        self.other_dead_creatures = np.array(
+            [np.array([len(list(filter(lambda x: x.is_dead, []))) for _ in range(self.vision_range * 2 + 1)]) for _ in
+             range(self.vision_range * 2 + 1)])
         self.action = 0
         self.model = PPO.load("ppo_agent2")
         super(PPOAgent, self).__init__(world, creature)
@@ -24,7 +27,7 @@ class PPOAgent(AgentBase):
     def step(self):
         """Runs through logic to decide next action."""
         self.vision()
-        agentstate = np.stack((np.array(self.grass), np.array(self.walkable), np.array(self.other_creatures),
+        agentstate = np.stack((np.array(self.grass), np.array(self.walkable), np.array(self.other_creatures), np.array(self.other_dead_creatures),
                                np.ones((self.vision_range * 2 + 1, self.vision_range * 2 + 1)) * self.creature.food))
         self.action, _ = self.model.predict(agentstate)
         valid = self.creature.request_action(self.action)
@@ -196,7 +199,7 @@ class PPOAgentPred(AgentBase):
         self.other_dead_creatures = np.array(
             [np.array([len(list(filter(lambda x: x.is_dead, []))) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
         self.action = 0
-        self.model = PPO.load("ppo_agent3.zip")
+        self.model = PPO.load("ppo_agent4.zip")
         super(PPOAgentPred, self).__init__(world, creature)
 
     def step(self):
