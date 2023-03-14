@@ -43,8 +43,9 @@ class Clouds(Layer):
         self.grid -= temp_grid * rand
 
         rng = np.random.default_rng()
-        self.grid = np.roll(self.grid, 1-rng.integers(0,3,dtype=int), axis=np.random.randint(2, size=2))
-
+        #self.grid = np.roll(self.grid, 1-rng.integers(0,3,dtype=int), axis=np.random.randint(2, size=2))
+        self.grid = np.roll(self.grid, -1, axis=(0,1))
+        #np.swapaxes(self.grid,0,1)
 
         self.grid -= 0.0012  # 0.012
         self.grid = np.clip(self.grid, 0, 1)
