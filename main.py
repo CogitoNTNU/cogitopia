@@ -9,6 +9,7 @@ from agents.t_agent import TAgent
 from agents.j_agent import JAgent
 from agents.b_agent import BAgent
 from agents.sau_agent import SauAgent
+from agents.trainA import TrainAgentA
 from rendering import Renderer
 from world.world import World, WorldSettings
 
@@ -46,24 +47,25 @@ wandb.init(project="Cogitopia monitor",
                    "git_hash": sha,
                    "world_settings": ws.settings})
 
-#def spawn(amount, agent_type):
-#    for _ in range(amount):
-#        x_pos = random.randrange(grid_width)
-#        y_pos = random.randrange(grid_height)
-#        if world.water.get_value(x_pos, y_pos) == 0:
-#            creature = world.spawn_creature(x_pos, y_pos, agent_type.COLOR, agent_type.IS_PREDATOR)
-#            agents.append(agent_type(world, creature))
+def spawn(amount, agent_type):
+    for _ in range(amount):
+        x_pos = random.randrange(grid_width)
+        y_pos = random.randrange(grid_height)
+        if world.water.get_value(x_pos, y_pos) == 0:
+            creature = world.spawn_creature(x_pos, y_pos, agent_type.COLOR, agent_type.IS_PREDATOR)
+            agents.append(agent_type(world, creature))
 env = make_vec_env(TrainWorld, n_envs=2)
 #env = agent
 
 #spawn(ws.j_agent_amount, JAgent)
 #spawn(ws.t_agent_amount, TAgent)
 #spawn(ws.b_agent_amount, BAgent)
+spawn(100, TrainAgentA)
 new_logger = configure('./results', ["stdout", "csv", "json", "log"])
-model = PPO("MlpPolicy", env, 1/1000, verbose=1)
+model = PPO.load("ppo_agent1.zip", env=env)
 model.set_logger(new_logger)
-model.learn(total_timesteps=500000, log_interval=4)
-model.save("ppo_agent1")
+#model.learn(total_timesteps=50000, log_interval=4)
+#model.save("ppo_agent1")
 
 total_len = 0
 num_episodes = 0
@@ -71,17 +73,17 @@ num_episodes = 0
 #env = TrainAgent(render_enabled=True)
 obs = env.reset()
 
-while True:
-    action, _states = model.predict(obs, deterministic=False)
-    obs, _, done, _ = env.step(action)
+#while True:
+#    action, _states = model.predict(obs, deterministic=False)
+#    obs, _, done, _ = env.step(action)
 
-    env.render() # Comment out this call to train faster
+#    env.render() # Comment out this call to train faster
 
-    if done:
-        total_len += env.player.len
-        num_episodes += 1
-        obs = env.reset()
-        print('Average len: {:.1f}'.format(total_len / num_episodes))
+#    if done:
+#        total_len += env.player.len
+#        num_episodes += 1
+#        obs = env.reset()
+#        print('Average len: {:.1f}'.format(total_len / num_episodes))
 
 
 def reproduction_callback(parent):

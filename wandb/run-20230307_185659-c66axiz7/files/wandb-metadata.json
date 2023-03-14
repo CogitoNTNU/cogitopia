@@ -1,0 +1,42 @@
+{
+    "os": "Windows-10-10.0.19044-SP0",
+    "python": "3.10.10",
+    "heartbeatAt": "2023-03-07T17:57:00.761961",
+    "startedAt": "2023-03-07T17:56:59.873634",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "C:\\Users\\oeste\\OneDrive\\Dokumenter\\NTNU\\Cogito\\Evolution\\cogitopia\\main.py",
+    "codePath": "main.py",
+    "git": {
+        "remote": "https://github.com/CogitoNTNU/cogitopia",
+        "commit": "39cb38573450bf21ffe45398110b58dee5a97285"
+    },
+    "email": "aleksos@stud.ntnu.no",
+    "root": "C:/Users/oeste/OneDrive/Dokumenter/NTNU/Cogito/Evolution/cogitopia",
+    "host": "DESKTOP-IN99L40",
+    "username": "oeste",
+    "executable": "C:\\Users\\oeste\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\\python.exe",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 2301.0,
+        "min": 0.0,
+        "max": 2301.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2301.0,
+            "min": 0.0,
+            "max": 2301.0
+        }
+    ],
+    "disk": {
+        "total": 237.44823837280273,
+        "used": 135.02848052978516
+    },
+    "memory": {
+        "total": 15.313533782958984
+    }
+}
