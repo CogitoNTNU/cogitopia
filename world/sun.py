@@ -9,8 +9,8 @@ class Sun(Layer):
         Layer.__init__(self, grid_width, grid_height, initial, world)
 
     def step(self, time):
-        mu = self.world.grid_width / 2
-        sigma = self.world.grid_width / 4
+        mu = self.world.grid_height / 2
+        sigma = self.world.grid_height/ 4
 
         for i in range(self.world.grid_width):
             self.grid[i] = (np.cos(time / 24 * 2 * np.pi + (i) * 2 * np.pi / self.world.grid_width) + 0.3)

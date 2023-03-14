@@ -17,7 +17,8 @@ class Temperature(Layer):
         diff = np.diff(temp_grid, axis = 0)
         self.grid += 0.1*(diff)
         self.grid += 0.1 * self.world.sun.grid
-        self.grid -= 0.03 *self.world.height.grid
+        self.grid -= 0.06 *self.world.height.grid
+        self.grid -= 0.005
         self.grid = np.clip(self.grid, 0, 1)
 
 
@@ -26,4 +27,4 @@ class Temperature(Layer):
 
     @staticmethod
     def get_color(value):
-        return value * 100 + 50, 0, 0
+        return value * 100 , 0, 0

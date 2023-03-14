@@ -17,16 +17,15 @@ class Renderer:
         self.draw_layer(self.world.earth)
         self.draw_layer(self.world.grass)
         self.draw_layer(self.world.water)
+        #self.draw_layer(self.world.sun)
+        self.draw_layer(self.world.temperature)
+        #self.draw_layer(self.world.height)
         self.draw_sun()
-        self.draw_layer(self.world.smell)
+        #self.draw_height()
+        #self.draw_layer(self.world.smell)
         for c in self.world.creatures:
             self.draw_creature(c)
 
-        for x in range(self.grid_width):
-            for y in range(self.grid_height):
-                test = pygame.Surface((self.scale,self.scale))
-                test.set_alpha((1-self.world.sun.grid[x][y])*30)
-                self.screen.blit(test, (x*self.scale, y*self.scale))
         self.draw_hud()
 
     def draw_layer(self, layer):
@@ -36,6 +35,13 @@ class Renderer:
                     pygame.draw.rect(self.screen, layer.get_color(layer.get_value(x, y)),
                                      (self.scale * x, self.scale * y, self.scale, self.scale))
     def draw_sun(self):
+        for x in range(self.grid_width):
+            for y in range(self.grid_height):
+                test = pygame.Surface((self.scale,self.scale))
+                test.set_alpha((1-self.world.sun.grid[x][y])*100)
+                self.screen.blit(test, (x*self.scale, y*self.scale))
+
+    def draw_height(self):
         for x in range(self.grid_width):
             for y in range(self.grid_height):
                 test = pygame.Surface((self.scale,self.scale))
