@@ -44,7 +44,7 @@ class TrainWorld(gym.Env):
         self.callback = None
         self.agents = []
         self.model = PPO.load(path="ppo_agent2.zip")
-        self.predatormodel = PPO.load(path="ppo_agent3.zip")
+        self.predatormodel = PPO.load(path="ppo_agent4.zip")
 
         def reproduction_callback(parent):
             c = self.world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
@@ -65,7 +65,7 @@ class TrainWorld(gym.Env):
     def reset(self):
         self.world = World(grid_width=40, grid_height=20, settings=WorldSettings())
         self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), True)
-        self.predatormodel = PPO.load(path="ppo_agent3.zip")
+        self.predatormodel = PPO.load(path="ppo_agent4.zip")
         self.player = TrainAgent(self.world, self.creature)
         self.world_age = 1
         self.agents = []
@@ -115,7 +115,7 @@ class TrainWorld(gym.Env):
         reward += len(list(filter(lambda x: x.creature.predator, self.agents)))*7 + self.world.murders
         survive = self.player.tick()
         if not survive:
-            reward = -1000 + self.world_age/3
+            reward = (-1000 + self.world_age/3)*0.1
             #print("dead", self.world_age, len(self.agents))
             done = True
         done = done or len(list(filter(lambda x: x.creature.predator, self.agents))) > 2048 or self.world_age > 3000
@@ -144,8 +144,8 @@ if __name__=="__main__":
     env = make_vec_env(TrainWorld, n_envs=20, vec_env_cls=SubprocVecEnv)
     env = VecMonitor(env)
     # env = agent
-    model = PPO("MlpPolicy", env, 1/15000, batch_size=20*2048, verbose=1, tensorboard_log="./tmp/tensorlog/", n_epochs=30)
-    model.set_parameters("ppo_agent3.zip")
+    model = PPO("MlpPolicy", env, 1/500, batch_size=20*2048, verbose=1, tensorboard_log="./tmp/tensorlog/", n_epochs=30)
+    #model.set_parameters("ppo_agent3.zip")
     wandb.tensorboard.patch(root_logdir="./tmp/tensorlog/")
     trainrun = wandb.init(project="Cogitopia ppovision",
                           entity="torghauk-team",
@@ -155,12 +155,12 @@ if __name__=="__main__":
                                   "world_settings": ws.settings})
     for i in range(0,31):
         model.learning_rate = 1/(75)
-        model.learn(total_timesteps=220000, log_interval=1, progress_bar=True,
+        model.learn(total_timesteps=420000, log_interval=1, progress_bar=True,
                     callback=WandbCallback(
                         gradient_save_freq=1000,
                         verbose=2,
                         log="all"
                     ))
-        model.save("ppo_agent3")
+        model.save("ppo_agent4")
     trainrun.finish()
 
