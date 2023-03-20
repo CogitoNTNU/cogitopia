@@ -46,9 +46,9 @@ if __name__ == '__main__':
                 creature = world.spawn_creature(x_pos, y_pos, agent_type.COLOR, agent_type.IS_PREDATOR)
                 agents.append(agent_type(world, creature))
 
-    spawn(ws.j_agent_amount, JAgent)
-    spawn(ws.t_agent_amount, TAgent)
-    spawn(ws.b_agent_amount, BAgent)
+    #spawn(ws.j_agent_amount, JAgent)
+    #spawn(ws.t_agent_amount, TAgent)
+    #spawn(ws.b_agent_amount, BAgent)
 
     def reproduction_callback(parent):
         c = world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
