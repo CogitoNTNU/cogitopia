@@ -13,7 +13,10 @@ class MoveableWater(Layer):
         self.amount = 1
 
     def step(self):
-        flow = 1
+        flow = 10
+        self.grid[7, 7] = 1
+        self.grid[8, 8] = 1
+        self.grid[7, 8] = 1
         x, y = np.nonzero(self.grid)
         # if np.random.randint(0, 100) > 95:
         #     self.grid += self.world.clouds.grid

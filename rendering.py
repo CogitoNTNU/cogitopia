@@ -16,12 +16,13 @@ class Renderer:
     def draw_world(self):
         self.draw_layer(self.world.earth)
         self.draw_layer(self.world.grass)
-        #self.draw_layer(self.world.water)
+        self.draw_layer(self.world.water)
         self.draw_layer(self.world.clouds)
+        self.draw_layer(self.world.ice)
 
         #self.draw_layer(self.world.temperature)
-        self.draw_layer(self.world.height)
-        self.draw_layer(self.world.moveableWater)
+        #self.draw_layer(self.world.height)
+        #self.draw_layer(self.world.moveableWater)
         self.draw_sun()
         #self.draw_height()
         #self.draw_layer(self.world.smell)

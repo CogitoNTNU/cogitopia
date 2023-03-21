@@ -11,14 +11,14 @@ class Temperature(Layer):
         temp_grid = self.grid.copy()
         temp_grid = np.c_[temp_grid,temp_grid[:,0]]
         diff = np.diff(temp_grid,axis = 1)
-        self.grid += 0.1*(diff)
+        self.grid += 0.01*(diff)
         temp_grid = self.grid.copy()
         temp_grid = np.r_[temp_grid, [temp_grid[0]]]
         diff = np.diff(temp_grid, axis = 0)
-        self.grid += 0.1*(diff)
+        self.grid += 0.01*(diff)
         self.grid += 0.1 * self.world.sun.grid
         self.grid -= 0.06 *self.world.height.grid
-        self.grid -= 0.005
+        self.grid -= 0.006
         self.grid = np.clip(self.grid, 0, 1)
 
 

@@ -15,6 +15,7 @@ from .sun import Sun
 from .creature import Creature
 from .smell import Smell
 from .moveableWater import MoveableWater
+from .ice import Ice
 
 
 # WorldSettings should have all constants that
@@ -62,6 +63,7 @@ class World:
         self.temperature = Temperature(self.grid_width, self.grid_height, self.initialize(), self)
         self.height = Height(self.grid_width, self.grid_height, self.initialize(1), self)
         self.water = Water(self.grid_width, self.grid_height, self.height, self)
+        self.ice = Ice(self.grid_width, self.grid_height, self.initialize(1), self)
         self.sun = Sun(self.grid_width, self.grid_height, self)
         self.creatures = []
         self.reproduction_callback = lambda: None
@@ -85,6 +87,7 @@ class World:
         self.earth.step()
         self.smell.step()
         self.clouds.step()
+        self.ice.step()
         self.moveableWater.step()
         if self.settings.use_temp:
             self.temperature.step()
