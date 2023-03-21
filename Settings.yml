@@ -6,7 +6,7 @@ grass_growth_rate : 2
 t_agent_amount: 100
 j_agent_amount: 100
 b_agent_amount: 100
-clock_speed : 10
+clock_speed : 1
 creature_starting_food : 0.4
 turning_food_cost: 0.0005
 walking_food_cost : 0.002

@@ -16,7 +16,7 @@ class Renderer:
     def draw_world(self):
         self.draw_layer(self.world.earth)
         self.draw_layer(self.world.grass)
-        self.draw_layer(self.world.water)
+        #self.draw_layer(self.world.water)
         self.draw_layer(self.world.clouds)
 
         #self.draw_layer(self.world.temperature)

@@ -7,7 +7,7 @@ class Height(Layer):
 
     @staticmethod
     def get_color(value):
-        return value * 200, value * 200, value * 200
+        return value * 244, value * 244, value * 244
 
     def get_height_difference(self, x1, y1, x2, y2):
         height1 = self.grid[x1][y1]

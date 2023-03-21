@@ -32,11 +32,11 @@ if __name__ == '__main__':
     repo = git.Repo(search_parent_directories=True)
     sha = repo.head.object.hexsha
 
-    wandb.init(project="Cogitopia monitor",
-               entity="torghauk-team",
-               config={"growth_rate": ws.grass_growth_rate,
-                       "git_hash": sha,
-                       "world_settings": ws.settings})
+    # wandb.init(project="Cogitopia monitor",
+    #            entity="torghauk-team",
+    #            config={"growth_rate": ws.grass_growth_rate,
+    #                    "git_hash": sha,
+    #                    "world_settings": ws.settings})
 
     def spawn(amount, agent_type):
         for _ in range(amount):
@@ -88,9 +88,9 @@ if __name__ == '__main__':
             if type(agent) == TAgent and not agent.creature.is_dead: t_agentcount += 1
             if type(agent) == BAgent and not agent.creature.is_dead: b_agentcount += 1
 
-        wandb.log({"time": world.get_time(), "agentdiff": len(agents) - lastamount, "agentcount": len(agents),
-                   "timeuse": time.time() - lasttime, "j_agentcount": j_agentcount, "t_agentcount": t_agentcount,
-                   "b_agentcount": b_agentcount})
+        # wandb.log({"time": world.get_time(), "agentdiff": len(agents) - lastamount, "agentcount": len(agents),
+        #            "timeuse": time.time() - lasttime, "j_agentcount": j_agentcount, "t_agentcount": t_agentcount,
+        #            "b_agentcount": b_agentcount})
         lasttime = time.time()
         lastamount = len(agents)
         # Render everything and display
