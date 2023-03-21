@@ -9,7 +9,7 @@ import pickle
 import random
 import time
 
-from train_world import TrainWorld
+from NEAT_world import TrainWorld
 import gym.wrappers
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,8 +21,8 @@ NUM_CORES = 8
 
 env = TrainWorld()
 
-print("action space: {0!r}".format(env.action_space))
-print("observation space: {0!r}".format(env.observation_space))
+#print("action space: {0!r}".format(env.action_space))
+#print("observation space: {0!r}".format(env.observation_space))
 
 
 class LanderGenome(neat.DefaultGenome):
@@ -64,7 +64,7 @@ def compute_fitness(genome, net, episodes, min_reward, max_reward):
         dr = np.clip(dr, -1.0, 1.0)
 
         for row, dr in zip(data, dr):
-            observation = row[:8]
+            observation = row[:245]
             action = int(row[8])
             output = net.activate(observation)
             reward_error.append(float((output[action] - dr) ** 2))
@@ -87,19 +87,31 @@ class PooledErrorCompute(object):
     def simulate(self, nets):
         scores = []
         for genome, net in nets:
-            observation = env.reset()
+            observation = [env.reset()]
             step = 0
             data = []
             while 1:
                 step += 1
-                if step < 200 and random.random() < 0.2:
-                    action = env.action_space.sample()
-                else:
-                    output = net.activate(observation)
-                    action = np.argmax(output)
 
-                observation, reward, done, info = env.step(action)
-                data.append(np.hstack((observation, action, reward)))
+                actions = []
+                if step < 200 and random.random() < 0.2:
+                    actions.append(env.action_space.sample())
+                else:
+                    output = net.activate(observation[0].flatten())
+                    actions.append(np.argmax(output))
+
+                for i in range(min(len(observation)-1, len(env.agents))):
+                    if step < 200 and random.random() < 0.2:
+                        actions.append(env.action_space.sample())
+                    else:
+                        output = net.activate(observation[i+1].flatten())
+                        actions.append(np.argmax(output))
+
+
+
+
+                observation, reward, done, info = env.step(actions)
+                data.append(np.hstack((observation[0].flatten(), actions[0], reward)))
 
                 if done:
                     break
@@ -175,7 +187,7 @@ def run():
     ec = PooledErrorCompute(NUM_CORES)
     while 1:
         try:
-            #gen_best = pop.run(ec.evaluate_genomes, 5)
+            gen_best = pop.run(ec.evaluate_genomes, 7)
 
             # print(gen_best)
 
@@ -210,15 +222,25 @@ def run():
                     step += 1
                     # Use the total reward estimates from all five networks to
                     # determine the best action given the current state.
-                    votes = np.zeros((4,))
+                    actions = []
+                    votes = np.zeros((8,))
                     for n in best_networks:
-                        output = n.activate(observation)
+                        output = n.activate(observation[0])
                         votes[np.argmax(output)] += 1
 
-                    best_action = np.argmax(votes)
-                    observation, reward, done, info = env.step(best_action)
+                    actions.append(np.argmax(votes))
+                    for i in range(min(len(observation-1), len(env.agents))):
+                        votes = np.zeros((8,))
+                        for n in best_networks:
+                            output = n.activate(observation[i+1])
+                            votes[np.argmax(output)] += 1
+
+                        actions.append(np.argmax(votes))
+
+
+                    observation, reward, done, info = env.step(actions)
                     score += reward
-                    env.render()
+                    #env.render()
                     if done:
                         break
 
@@ -241,8 +263,8 @@ def run():
                     with open(name + '.pickle', 'wb') as f:
                         pickle.dump(g, f)
 
-                    visualize.draw_net(config, g, view=False, filename=name + "-net.gv")
-                    visualize.draw_net(config, g, view=False, filename=name + "-net-pruned.gv", prune_unused=True)
+                    #visualize.draw_net(config, g, view=False, filename=name + "-net.gv")
+                    #visualize.draw_net(config, g, view=False, filename=name + "-net-pruned.gv", prune_unused=True)
 
                 break
         except KeyboardInterrupt:
