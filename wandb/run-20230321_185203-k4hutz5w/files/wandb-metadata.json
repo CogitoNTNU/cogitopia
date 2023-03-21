@@ -1,0 +1,42 @@
+{
+    "os": "Windows-10-10.0.19044-SP0",
+    "python": "3.10.10",
+    "heartbeatAt": "2023-03-21T17:52:04.774199",
+    "startedAt": "2023-03-21T17:52:03.528663",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "c:\\Users\\oeste\\OneDrive\\Dokumenter\\NTNU\\Cogito\\Evolution\\cogitopia\\train_world.py",
+    "codePath": "train_world.py",
+    "git": {
+        "remote": "https://github.com/CogitoNTNU/cogitopia",
+        "commit": "d7df601f346fbd25ad963a750576030c0d4fd48f"
+    },
+    "email": "aleksos@stud.ntnu.no",
+    "root": "C:/Users/oeste/OneDrive/Dokumenter/NTNU/Cogito/Evolution/cogitopia",
+    "host": "DESKTOP-IN99L40",
+    "username": "oeste",
+    "executable": "C:\\Users\\oeste\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.10_qbz5n2kfra8p0\\python.exe",
+    "cpu_count": 6,
+    "cpu_count_logical": 12,
+    "cpu_freq": {
+        "current": 1887.0,
+        "min": 0.0,
+        "max": 2301.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 1887.0,
+            "min": 0.0,
+            "max": 2301.0
+        }
+    ],
+    "disk": {
+        "total": 237.44823837280273,
+        "used": 134.21355438232422
+    },
+    "memory": {
+        "total": 15.313533782958984
+    }
+}

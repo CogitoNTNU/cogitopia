@@ -18,6 +18,9 @@ from world.creature import Creature
 from agents.train import TrainAgent
 from stable_baselines3 import PPO
 
+from sb3_contrib import RecurrentPPO
+from stable_baselines3.common.evaluation import evaluate_policy
+
 import random
 #import sys
 #from collections import deque
@@ -44,8 +47,10 @@ class TrainWorld(gym.Env):
         self.callback = None
         self.agents = []
         #self.model = PPO("MlpPolicy", self.world, 1/1000, verbose=1) #
-        self.model = PPO.load(path="ppo_agentA")
+        #self.model = PPO.load(path="ppo_agentA")
+        #self.model = RecurrentPPO("MlpLstmPolicy", self.world, 1/1000, verbose=1)
         #self.predatormodel = PPO.load(path="ppo_agent4.zip")
+        #self.lstm_states = None
 
         def reproduction_callback(parent):
             c = self.world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
@@ -64,9 +69,10 @@ class TrainWorld(gym.Env):
         return np.zeros(shape=(5, self.player.vision_range*2+1, self.player.vision_range*2+1))
 
     def reset(self):
+        #self.lstm_states = None
         self.world = World(grid_width=40, grid_height=20, settings=WorldSettings())
         self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), False) #satt lik False
-        self.model = PPO.load(path="ppo_agentA")
+        #self.model = PPO.load(path="ppo_recurrent")
         self.player = TrainAgent(self.world, self.creature)
         self.world_age = 1
         self.agents = []
@@ -90,23 +96,25 @@ class TrainWorld(gym.Env):
         self.world.step()
         survive = self.player.tick()
         self.world_age += 1
-        for agent in self.agents:
-            if agent.world.is_dead(agent.creature):
-                # agent.creature.remove_from_array()
-                self.agents.remove(agent)
-                # world.creatures.remove(agent.creature)
-                continue
-            agent.vision()
-            agentstate = np.stack((np.array(agent.grass), np.array(agent.walkable), np.array(agent.other_creatures), np.array(agent.other_dead_creatures),
-                                       np.ones((agent.vision_range * 2 + 1,
-                                                agent.vision_range * 2 + 1)) * agent.creature.food))
-            if agent.creature.predator:
-                continue
-                action, _states = self.predatormodel.predict(agentstate, deterministic=False)
-            else:
-                action, _states = self.model.predict(agentstate, deterministic=False)
-            agent.action = action
-            agent.step()
+        # for agent in self.agents:
+        #     if agent.world.is_dead(agent.creature):
+        #         # agent.creature.remove_from_array()
+        #         self.agents.remove(agent)
+        #         # world.creatures.remove(agent.creature)
+        #         continue
+        #     agent.vision()
+        #     agentstate = np.stack((np.array(agent.grass), np.array(agent.walkable), np.array(agent.other_creatures), np.array(agent.other_dead_creatures),
+        #                                np.ones((agent.vision_range * 2 + 1,
+        #                                         agent.vision_range * 2 + 1)) * agent.creature.food))
+        #     if agent.creature.predator:
+        #         continue
+        #         action, _states = self.predatormodel.predict(agentstate, deterministic=False)
+        #     else:
+        #         #action, _states = self.model.predict(agentstate, deterministic=False)
+        #         action, lstm_states = self.model.predict(agentstate, state=lstm_states, episode_start=episode_starts, deterministic=True)
+        #     agent.action = action
+            
+        #     agent.step()
 
 
 
@@ -122,6 +130,7 @@ class TrainWorld(gym.Env):
         done = done or len(list(filter(lambda x: x.creature.predator, self.agents))) > 2048 or self.world_age > 3000
         if(self.world_age%500 == 0):
             print(self.world_age, len(self.agents), len(list(filter(lambda x: x.creature.predator, self.agents))))
+        episode_starts = done
         return state, reward, done, info
 
 
@@ -141,12 +150,15 @@ if __name__=="__main__":
     sha = repo.head.object.hexsha
 
 
-
-    env = make_vec_env(TrainWorld, n_envs=6, vec_env_cls=SubprocVecEnv)
-    env = VecMonitor(env)
+    
+    num_envs=6
+    episode_starts = np.ones((num_envs,), dtype=bool)
+    #env = make_vec_env(TrainWorld, num_envs, vec_env_cls=SubprocVecEnv)
+    env = TrainWorld()
+    model = RecurrentPPO("MlpLstmPolicy", env , 1/500, batch_size=6*2048, verbose=1, tensorboard_log="./tmp/tensorlog/", n_epochs=30)
+    mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=30, warn=False)
     # env = agent
-    model = PPO("MlpPolicy", env, 1/500, batch_size=6*2048, verbose=1, tensorboard_log="./tmp/tensorlog/", n_epochs=30)
-    model.set_parameters("ppo_agentA.zip")
+    #model.set_parameters("ppo_agentA.zip")
     wandb.tensorboard.patch(root_logdir="./tmp/tensorlog/")
     trainrun = wandb.init(project="Cogitopia ppovision",
                           entity="torghauk-team",
@@ -161,6 +173,6 @@ if __name__=="__main__":
                         verbose=2,
                         log="all"
                     ))
-        model.save("ppo_agentA")
+        model.save("ppo_recurrent")
     trainrun.finish()
 
