@@ -215,7 +215,7 @@ def run():
             solved = True
             best_scores = []
             for k in range(100):
-                observation = env.reset()
+                observation = [env.reset()]
                 score = 0
                 step = 0
                 while 1:
