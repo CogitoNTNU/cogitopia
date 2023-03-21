@@ -1,0 +1,1 @@
+{"time": 37182, "agentdiff": 1, "agentcount": 111, "timeuse": 0.11797666549682617, "j_agentcount": 37, "t_agentcount": 55, "b_agentcount": 0, "ppo_agentcount": 19, "ppo_agent_predcount": 0, "_timestamp": 1679415056.663968, "_runtime": 4940.445922136307, "_step": 37181, "_wandb": {"runtime": 4939}}

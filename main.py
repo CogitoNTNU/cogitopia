@@ -51,7 +51,8 @@ spawn(ws.j_agent_amount, JAgent)
 spawn(ws.t_agent_amount, TAgent)
 spawn(ws.b_agent_amount, BAgent)
 spawn(20, PPOAgent)
-spawn(20, PPOAgentPred)
+#spawn(20, PPOAgentPred)
+
 
 def reproduction_callback(parent):
     c = world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)

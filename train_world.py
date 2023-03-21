@@ -36,21 +36,22 @@ import gym
 class TrainWorld(gym.Env):
     def __init__(self):
         self.world = World(grid_width=40, grid_height=20, settings=WorldSettings())
-        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), True)
+        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), False)
         self.player = TrainAgent(self.world, self.creature)
         self.action_space = spaces.Discrete(8)
         self.observation_space = spaces.Box(low=0, high=1, shape=(5, self.player.vision_range*2+1, self.player.vision_range*2+1))
         self.world_age = 1
         self.callback = None
         self.agents = []
-        self.model = PPO.load(path="ppo_agent2.zip")
-        self.predatormodel = PPO.load(path="ppo_agent4.zip")
+        #self.model = PPO("MlpPolicy", self.world, 1/1000, verbose=1) #
+        self.model = PPO.load(path="ppo_agentA")
+        #self.predatormodel = PPO.load(path="ppo_agent4.zip")
 
         def reproduction_callback(parent):
             c = self.world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
             self.agents.append(parent.agent_type(self.world, c))
             return True
-        for i in range(25): self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), False)))
+        #for i in range(25): self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), False)))
         self.world.reproduction_callback = reproduction_callback
 
     def spawn_creature(self, x_pos, y_pos, color, predator):
@@ -64,8 +65,8 @@ class TrainWorld(gym.Env):
 
     def reset(self):
         self.world = World(grid_width=40, grid_height=20, settings=WorldSettings())
-        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), True)
-        self.predatormodel = PPO.load(path="ppo_agent4.zip")
+        self.creature = self.world.spawn_creature(5, 5, (5, 150, 5), False) #satt lik False
+        self.model = PPO.load(path="ppo_agentA")
         self.player = TrainAgent(self.world, self.creature)
         self.world_age = 1
         self.agents = []
@@ -73,7 +74,7 @@ class TrainWorld(gym.Env):
             c = self.world.spawn_creature(parent.x, parent.y, parent.color, parent.predator)
             self.agents.append(parent.agent_type(self.world, c))
             return True
-        for i in range(25): self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), False)))
+        #for i in range(25): self.agents.append(TrainAgent(self.world, self.world.spawn_creature(5, 5, (5, 150, 5), False)))
         self.world.reproduction_callback = reproduction_callback
         return self.init_state()
 
@@ -96,13 +97,11 @@ class TrainWorld(gym.Env):
                 # world.creatures.remove(agent.creature)
                 continue
             agent.vision()
-            agentstate = np.stack((np.array(agent.grass), np.array(agent.walkable),np.array(agent.other_creatures),
-                              np.ones((agent.vision_range * 2 + 1, agent.vision_range * 2 + 1)) * agent.creature.food))
-
-            if agent.creature.predator:
-                agentstate = np.stack((np.array(agent.grass), np.array(agent.walkable), np.array(agent.other_creatures), np.array(agent.other_dead_creatures),
+            agentstate = np.stack((np.array(agent.grass), np.array(agent.walkable), np.array(agent.other_creatures), np.array(agent.other_dead_creatures),
                                        np.ones((agent.vision_range * 2 + 1,
                                                 agent.vision_range * 2 + 1)) * agent.creature.food))
+            if agent.creature.predator:
+                continue
                 action, _states = self.predatormodel.predict(agentstate, deterministic=False)
             else:
                 action, _states = self.model.predict(agentstate, deterministic=False)
@@ -112,7 +111,9 @@ class TrainWorld(gym.Env):
 
 
         # Death
-        reward += len(list(filter(lambda x: x.creature.predator, self.agents)))*7 + self.world.murders
+        #reward += len(list(filter(lambda x: x.creature.predator, self.agents)))*7 + self.world.murders
+        if self.player.creature.food>0.8:
+            reward += 1
         survive = self.player.tick()
         if not survive:
             reward = (-1000 + self.world_age/3)*0.1
@@ -141,11 +142,11 @@ if __name__=="__main__":
 
 
 
-    env = make_vec_env(TrainWorld, n_envs=20, vec_env_cls=SubprocVecEnv)
+    env = make_vec_env(TrainWorld, n_envs=6, vec_env_cls=SubprocVecEnv)
     env = VecMonitor(env)
     # env = agent
-    model = PPO("MlpPolicy", env, 1/500, batch_size=20*2048, verbose=1, tensorboard_log="./tmp/tensorlog/", n_epochs=30)
-    #model.set_parameters("ppo_agent3.zip")
+    model = PPO("MlpPolicy", env, 1/500, batch_size=6*2048, verbose=1, tensorboard_log="./tmp/tensorlog/", n_epochs=30)
+    model.set_parameters("ppo_agentA.zip")
     wandb.tensorboard.patch(root_logdir="./tmp/tensorlog/")
     trainrun = wandb.init(project="Cogitopia ppovision",
                           entity="torghauk-team",
@@ -154,13 +155,12 @@ if __name__=="__main__":
                                   "git_hash": sha,
                                   "world_settings": ws.settings})
     for i in range(0,31):
-        model.learning_rate = 1/(75)
-        model.learn(total_timesteps=420000, log_interval=1, progress_bar=True,
+        model.learn(total_timesteps=100000, log_interval=1, progress_bar=False,
                     callback=WandbCallback(
                         gradient_save_freq=1000,
                         verbose=2,
                         log="all"
                     ))
-        model.save("ppo_agent4")
+        model.save("ppo_agentA")
     trainrun.finish()
 

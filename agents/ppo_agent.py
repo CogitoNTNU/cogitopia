@@ -17,15 +17,19 @@ class PPOAgent(AgentBase):
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.other_creatures = np.array(
             [np.array([len([]) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
+        self.other_dead_creatures = np.array(
+            [np.array([len(list(filter(lambda x: x.is_dead, []))) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
         self.action = 0
-        self.model = PPO.load("ppo_agent2")
+        self.model = PPO.load("ppo_agentA")
         super(PPOAgent, self).__init__(world, creature)
 
     def step(self):
         """Runs through logic to decide next action."""
         self.vision()
-        agentstate = np.stack((np.array(self.grass), np.array(self.walkable), np.array(self.other_creatures),
+        agentstate = np.stack((np.array(self.grass), np.array(self.walkable), np.array(self.other_creatures), np.array(self.other_dead_creatures),
                                np.ones((self.vision_range * 2 + 1, self.vision_range * 2 + 1)) * self.creature.food))
+        self.other_dead_creatures = np.array(
+            [np.array([len(list(filter(lambda x: x.is_dead, []))) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
         self.action, _ = self.model.predict(agentstate)
         valid = self.creature.request_action(self.action)
         assert valid, 'Invalid action!'
@@ -138,6 +142,12 @@ class PPOAgent(AgentBase):
         y_pos = (self.creature.y + pos[1]) % self.world.grid_height
         return len(self.world.creatures_array[x_pos][y_pos])
 
+    def get_dead_creatures(self, pos):
+        """Gets creatures in vision range"""
+        x_pos = (self.creature.x + pos[0]) % self.world.grid_width
+        y_pos = (self.creature.y + pos[1]) % self.world.grid_height
+        return len(list(filter(lambda x: x.is_dead, self.world.creatures_array[x_pos][y_pos])))
+
     def check_grid(self, grid):
         out = None
         if self.creature.y - self.vision_range < 0 and self.creature.x - self.vision_range < 0:
@@ -179,6 +189,7 @@ class PPOAgent(AgentBase):
                 #        #self.grass[self.vision_range + i][self.vision_range + j] = self.get_grass((i, j))
                 #        self.walkable[self.vision_range + i][self.vision_range + j] = self.is_walkable((i, j))
                 self.other_creatures[self.vision_range + i][self.vision_range + j] = self.get_creatures((i, j))
+                self.other_dead_creatures[self.vision_range + i][self.vision_range + j] = self.get_dead_creatures((i, j))
 
 
 
@@ -196,7 +207,7 @@ class PPOAgentPred(AgentBase):
         self.other_dead_creatures = np.array(
             [np.array([len(list(filter(lambda x: x.is_dead, []))) for _ in range(self.vision_range * 2 + 1)]) for _ in range(self.vision_range * 2 + 1)])
         self.action = 0
-        self.model = PPO.load("ppo_agent3.zip")
+        self.model = PPO.load("ppo_agent1.zip")
         super(PPOAgentPred, self).__init__(world, creature)
 
     def step(self):
