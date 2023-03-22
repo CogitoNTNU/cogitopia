@@ -12,24 +12,27 @@ class Renderer:
         self.screen = screen
         self.grid_width = world.grid_width
         self.grid_height = world.grid_height
+        self.font = pygame.font.SysFont('Arial',25)
 
     def draw_world(self):
         self.draw_layer(self.world.earth)
         self.draw_layer(self.world.grass)
         self.draw_layer(self.world.water)
         self.draw_layer(self.world.clouds)
-        self.draw_layer(self.world.ice)
+        #self.draw_layer(self.world.ice)
 
         #self.draw_layer(self.world.temperature)
         #self.draw_layer(self.world.height)
         #self.draw_layer(self.world.moveableWater)
         self.draw_sun()
+        self.draw_text('sun')
         #self.draw_height()
         #self.draw_layer(self.world.smell)
         for c in self.world.creatures:
             self.draw_creature(c)
 
         self.draw_hud()
+
 
     def draw_layer(self, layer):
         for x in range(self.grid_width):
@@ -50,6 +53,19 @@ class Renderer:
                 test = pygame.Surface((self.scale, self.scale))
                 test.set_alpha( 244 * (self.world.height.grid[x][y]))
                 self.screen.blit(test, (x * self.scale, y * self.scale))
+    def draw_text(self,type):
+        for x in range(self.grid_width):
+            for y in range(self.grid_height):
+                test = pygame.Surface((self.scale,self.scale))
+                if type == 'height':
+                    self.screen.blit(self.font.render(str(round(self.world.height.grid[x][y]*100)),True,(255,0,0)),(x * self.scale, y * self.scale))
+                elif type == 'grass':
+                    self.screen.blit(self.font.render(str(round(self.world.grass.grid[x][y]*100)),True,(255,0,0)),(x * self.scale, y * self.scale))
+                elif type == 'temperature':
+                    self.screen.blit(self.font.render(str(round(self.world.temperature.grid[x][y]*100)),True,(255,0,0)),(x * self.scale, y * self.scale))
+                elif type == 'sun':
+                    self.screen.blit(self.font.render(str(round(self.world.sun.grid[x][y]*100)),True,(255,0,0)),(x * self.scale, y * self.scale))
+
 
 
     def draw_creature(self, c):

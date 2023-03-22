@@ -21,6 +21,7 @@ if __name__ == '__main__':
 
     pygame.init()
     screen = pygame.display.set_mode([grid_width * scale, grid_height * scale])
+
     clock = pygame.time.Clock()
 
     # World setup
