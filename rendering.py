@@ -23,7 +23,7 @@ class Renderer:
         self.draw_layer(self.world.water)
         self.draw_layer(self.world.clouds)
         #self.draw_layer(self.world.ice)
-        self.draw_flower(self.world.flowers)
+        #self.draw_flower(self.world.flowers)
         #self.draw_layer(self.world.temperature)
         #self.draw_layer(self.world.height)
         #self.draw_layer(self.world.moveableWater)
@@ -58,14 +58,14 @@ class Renderer:
         for x in range(self.grid_width):
             for y in range(self.grid_height):
                 if layer.get_value(x, y) != 0:
-                    offsets = np.array([[0.2,0.8],[0.8,0.2],[0.8,0.8],[0.2,0.2],[0.5,0.5]])
+                    offsets = np.array([[-0.2,0.8],[-0.8,0.2],[-0.8,0.8],[-0.2,0.2],[-0.5,0.5]])
                     for i in range(int(layer.get_value(x,y)*5)):
                         x_offset = offsets[i,0]
                         y_offset = offsets[i,1]
 
-                        pygame.draw.circle(self.screen,layer.get_color(layer.get_value(x,y)),(self.scale * (x-x_offset), self.scale * (y-y_offset)),radius=self.scale*0.2)
+                        pygame.draw.circle(self.screen,layer.get_color(layer.get_value(x,y)),(self.scale * (x-x_offset), self.scale * (y-y_offset+1)),radius=self.scale*0.2)
                         pygame.draw.circle(self.screen, layer.get_second_color(layer.get_value(x, y)),
-                                           (self.scale * (x-(x_offset)), self.scale * (y-y_offset)), radius=self.scale * 0.1)
+                                           (self.scale * (x-(x_offset)), self.scale * (y-y_offset+1)), radius=self.scale * 0.1)
 
                     # pygame.draw.circle(self.screen, layer.get_color(layer.get_value(x, y)),
                     #                    (self.scale * (x-0.5), self.scale * (y-0.5)), radius=self.scale * 0.2)
