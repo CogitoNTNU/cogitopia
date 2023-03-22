@@ -1,7 +1,7 @@
 import numpy as np
 
 from .layer import Layer
-
+import scipy
 
 class Grass(Layer):
     def __init__(self, grid_width, grid_height, initial, world):
@@ -15,7 +15,8 @@ class Grass(Layer):
             for j in range(self.grid_height):
                 if self.world.water.is_water(i, j):
                     self.grid[i][j] = 0
-
+        #self.grid = scipy.ndimage.convolve(self.grid,[[0.1,0.1,0.1],[0.1,0.2,0.1],[0.1,0.1,0.1]])
+        #self.grid = scipy.ndimage.convolve(self.grid, [[ 0.25, 0.25], [ 0.25, 0.25]])*1.2
         self.grid = np.clip(self.grid, 0, 1)
 
     def eat_grass(self, x, y):

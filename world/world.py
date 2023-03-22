@@ -16,6 +16,7 @@ from .creature import Creature
 from .smell import Smell
 from .moveableWater import MoveableWater
 from .ice import Ice
+from  .flowers import Flowers
 
 
 # WorldSettings should have all constants that
@@ -60,6 +61,7 @@ class World:
         self.earth = Earth(self.grid_width, self.grid_height, self.initialize(), self)
         self.smell = Smell(self.grid_width, self.grid_height, self.initialize(1), self)
         self.clouds = Clouds(self.grid_width, self.grid_height, self.initialize(1), self)
+        self.flowers = Flowers(self.grid_width, self.grid_height, self.initialize(1), self)
         self.moveableWater = MoveableWater(self.grid_width, self.grid_height, self.initialize(1), self)
         self.temperature = Temperature(self.grid_width, self.grid_height, self.initialize(), self)
         self.height = Height(self.grid_width, self.grid_height, self.initialize(1), self)
@@ -88,6 +90,7 @@ class World:
         self.earth.step()
         self.smell.step()
         self.clouds.step()
+        self.flowers.step()
         #self.ice.step()
         self.moveableWater.step()
         if self.settings.use_temp:

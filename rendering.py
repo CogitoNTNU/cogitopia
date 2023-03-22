@@ -1,5 +1,5 @@
 import pygame
-
+import scipy
 import world.world
 
 black = (0, 0, 0)
@@ -22,7 +22,7 @@ class Renderer:
         self.draw_layer(self.world.water)
         self.draw_layer(self.world.clouds)
         #self.draw_layer(self.world.ice)
-
+        self.draw_flower(self.world.flowers)
         #self.draw_layer(self.world.temperature)
         #self.draw_layer(self.world.height)
         #self.draw_layer(self.world.moveableWater)
@@ -38,17 +38,28 @@ class Renderer:
 
 
     def draw_layer(self, layer):
+        #grid = layer.grid
+        #grid = scipy.ndimage.convolve(layer.grid, [[0.25, 0.25], [0.25, 0.25]])
+        #grid = scipy.ndimage.convolve(layer.grid,[[0, 0., 0], [0., 1, 0.], [0.0, 0.0, 0.0]])
         for x in range(self.grid_width):
             for y in range(self.grid_height):
                 if layer.get_value(x, y) != 0:
-                    pygame.draw.rect(self.screen, layer.get_color(layer.get_value(x, y)),
-                                     (self.scale * x, self.scale * y, self.scale, self.scale))
+                    pygame.draw.rect(self.screen, layer.get_color(layer.get_value(x, y)),(self.scale * x, self.scale * y, self.scale, self.scale))
+                    #pygame.draw.rect(self.screen, layer.get_color(grid[x, y]),
+                                     #(self.scale * x, self.scale * y, self.scale, self.scale))
     def draw_sun(self):
         for x in range(self.grid_width):
             for y in range(self.grid_height):
                 test = pygame.Surface((self.scale,self.scale))
                 test.set_alpha((1-self.world.sun.grid[x][y])*100*(self.world.height.grid[x][y]))
                 self.screen.blit(test, (x*self.scale, y*self.scale))
+    def draw_flower(self,layer):
+        for x in range(self.grid_width):
+            for y in range(self.grid_height):
+                if layer.get_value(x, y) != 0:
+                    pygame.draw.circle(self.screen,layer.get_color(layer.get_value(x,y)),(self.scale * x, self.scale * y),radius=self.scale*0.2)
+                    pygame.draw.circle(self.screen, layer.get_second_color(layer.get_value(x, y)),
+                                       (self.scale * x, self.scale * y), radius=self.scale * 0.1)
 
     def draw_height(self):
         for x in range(self.grid_width):
@@ -68,6 +79,9 @@ class Renderer:
                     self.screen.blit(self.font.render(str(round(self.world.temperature.grid[x][y]*100)),True,(255,0,0)),(x * self.scale, y * self.scale))
                 elif type == 'sun':
                     self.screen.blit(self.font.render(str(round(self.world.sun.grid[x][y]*100)),True,(255,0,0)),(x * self.scale, y * self.scale))
+                elif type == 'earth':
+                    self.screen.blit(self.font.render(str(round(self.world.earth.grid[x][y] * 100)), True, (255, 0, 0)),
+                                     (x * self.scale, y * self.scale))
 
 
 
