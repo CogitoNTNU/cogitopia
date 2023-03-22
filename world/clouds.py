@@ -11,7 +11,7 @@ class Clouds(Layer):
         self.grid[5, 5] = 1
 
     def create_cloud(self,x_pos,y_pos):
-        factor = 0.1
+        #factor = 0.1
         self.grid[x_pos, y_pos] = 1
         #self.water_in_clouds += self.world.moveableWater.amount * factor
         #self.world.moveableWater.amount -= self.world.moveableWater.amount*factor

@@ -1,5 +1,6 @@
 import pygame
 import scipy
+import numpy as np
 import world.world
 
 black = (0, 0, 0)
@@ -57,9 +58,23 @@ class Renderer:
         for x in range(self.grid_width):
             for y in range(self.grid_height):
                 if layer.get_value(x, y) != 0:
-                    pygame.draw.circle(self.screen,layer.get_color(layer.get_value(x,y)),(self.scale * x, self.scale * y),radius=self.scale*0.2)
-                    pygame.draw.circle(self.screen, layer.get_second_color(layer.get_value(x, y)),
-                                       (self.scale * x, self.scale * y), radius=self.scale * 0.1)
+                    offsets = np.array([[0.2,0.8],[0.8,0.2],[0.8,0.8],[0.2,0.2],[0.5,0.5]])
+                    for i in range(int(layer.get_value(x,y)*5)):
+                        x_offset = offsets[i,0]
+                        y_offset = offsets[i,1]
+
+                        pygame.draw.circle(self.screen,layer.get_color(layer.get_value(x,y)),(self.scale * (x-x_offset), self.scale * (y-y_offset)),radius=self.scale*0.2)
+                        pygame.draw.circle(self.screen, layer.get_second_color(layer.get_value(x, y)),
+                                           (self.scale * (x-(x_offset)), self.scale * (y-y_offset)), radius=self.scale * 0.1)
+
+                    # pygame.draw.circle(self.screen, layer.get_color(layer.get_value(x, y)),
+                    #                    (self.scale * (x-0.5), self.scale * (y-0.5)), radius=self.scale * 0.2)
+                    # pygame.draw.circle(self.screen, layer.get_second_color(layer.get_value(x, y)),
+                    #                    (self.scale * (x-0.5), self.scale * (y-0.5)), radius=self.scale * 0.1)
+                    # pygame.draw.circle(self.screen, layer.get_color(layer.get_value(x, y)),
+                    #                    (self.scale * (x-np.random.random()), self.scale * (y-np.random.random())), radius=self.scale * 0.2)
+                    # pygame.draw.circle(self.screen, layer.get_second_color(layer.get_value(x, y)),
+                    #                    (self.scale * (x-np.random.random()), self.scale * (y-np.random.random())), radius=self.scale * 0.1)
 
     def draw_height(self):
         for x in range(self.grid_width):
