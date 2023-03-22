@@ -1,5 +1,7 @@
 import pygame
 
+import world.world
+
 black = (0, 0, 0)
 white = (200, 200, 200)
 red = (255, 0, 0)
@@ -25,7 +27,8 @@ class Renderer:
         #self.draw_layer(self.world.height)
         #self.draw_layer(self.world.moveableWater)
         self.draw_sun()
-        self.draw_text('sun')
+        if world.world.WorldSettings.show_value != "":
+            self.draw_text(world.world.WorldSettings.show_value)
         #self.draw_height()
         #self.draw_layer(self.world.smell)
         for c in self.world.creatures:

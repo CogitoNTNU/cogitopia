@@ -44,6 +44,7 @@ class WorldSettings:
     walking_in_water_cost = settings["walking_in_water_cost"]
     reproduction_cost = settings["reproduction_cost"]
     killing_cost = settings["killing_cost"]
+    show_value = settings["show_value"]
 
 
 # Variables that change during simulation, such

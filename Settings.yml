@@ -13,3 +13,4 @@ walking_food_cost : 0.002
 walking_in_water_cost : 0.008
 reproduction_cost : 0.5
 killing_cost : 0.2
+show_value : "sun"
