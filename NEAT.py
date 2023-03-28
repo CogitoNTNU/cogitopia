@@ -74,7 +74,7 @@ def compute_fitness(genome, net, episodes, min_reward, max_reward):
                 output = net.activate(observation[i + 1].flatten())
                 actions.append(np.argmax(output))
 
-            if actions[0] != 0: print(actions[0])
+            #if actions[0] != 0: print(actions[0])
             observation, reward, done, info = env.step(actions)
             data.append(np.hstack((observation[0].flatten(), actions[0], reward)))
 
@@ -188,8 +188,8 @@ def run():
                        "world_settings": ws.settings})
     while 1:
         try:
-            gen_best = pop.run(ec.evaluate_genomes, 7)
-            wandb.log({"num_species": len(pop.species)})
+            gen_best = pop.run(ec.evaluate_genomes, 5)
+            wandb.log({"num_species": len(pop.species.species)})
 
             # print(gen_best)
 
@@ -252,7 +252,7 @@ def run():
                 best_scores.append(score)
                 avg_score = sum(best_scores) / len(best_scores)
                 print(k, score, avg_score)
-                if avg_score < 200:
+                if avg_score < 2000:
                     solved = False
                     break
 

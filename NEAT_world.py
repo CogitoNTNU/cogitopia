@@ -132,8 +132,8 @@ class TrainWorld(gym.Env):
             #print("dead", self.world_age, len(self.agents))
             done = True
         done = done or len(list(filter(lambda x: not x.creature.predator, self.agents))) > 2048 or self.world_age > 3000
-        if(self.world_age%500 == 0):
-            print(self.world_age, len(self.agents), len(list(filter(lambda x: x.creature.predator, self.agents))))
+        #if(self.world_age%500 == 0):
+            #print(self.world_age, len(self.agents), len(list(filter(lambda x: x.creature.predator, self.agents))))
         return state, reward, done, info
 
 
