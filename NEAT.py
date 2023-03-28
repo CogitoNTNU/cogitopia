@@ -8,18 +8,27 @@ import os
 import pickle
 import random
 import time
-
+import yaml
+import git
 from NEAT_world import TrainWorld
 import gym.wrappers
 import matplotlib.pyplot as plt
+import wandb
 import numpy as np
+from world.world import WorldSettings
 
 import neat
 #import visualize
-
+ws = WorldSettings()
 NUM_CORES = 8
-
+repo = git.Repo(search_parent_directories=True)
+sha = repo.head.object.hexsha
 env = TrainWorld()
+wandb.init(project="Cogitopia NEAT monitor",
+           entity="torghauk-team",
+           config={"growth_rate": ws.grass_growth_rate,
+                   "git_hash": sha,
+                   "world_settings": ws.settings})
 
 #print("action space: {0!r}".format(env.action_space))
 #print("observation space: {0!r}".format(env.observation_space))
@@ -134,10 +143,13 @@ class PooledErrorCompute(object):
         print("Evaluating {0} test episodes".format(len(self.test_episodes)))
      #   if self.num_workers < 2:
         genome_num = 0
+        best_fitness = -1e100
         for genome, net in nets:
             #reward_error = compute_fitness(genome, net, self.test_episodes, self.min_reward, self.max_reward)
             genome.fitness = np.sum(self.episode_score[genome_num])
             genome_num+=1
+            if genome.fitness > best_fitness: best_fitness = genome.fitness
+        wandb.log(best_fitness)
 
    #    else:
    #        with multiprocessing.Pool(self.num_workers) as pool:
@@ -176,6 +188,7 @@ def run():
     while 1:
         try:
             gen_best = pop.run(ec.evaluate_genomes, 7)
+            wandb.log(len(pop.species))
 
             # print(gen_best)
 
