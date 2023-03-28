@@ -26,9 +26,6 @@ sha = repo.head.object.hexsha
 env = TrainWorld()
 
 
-#print("action space: {0!r}".format(env.action_space))
-#print("observation space: {0!r}".format(env.observation_space))
-
 
 class LanderGenome(neat.DefaultGenome):
     def __init__(self, key):
@@ -137,7 +134,6 @@ class PooledErrorCompute(object):
         # Assign a composite fitness to each genome; genomes can make progress either
         # by improving their total reward or by making more accurate reward estimates.
         print("Evaluating {0} test episodes".format(len(self.test_episodes)))
-     #   if self.num_workers < 2:
         genome_num = 0
         best_fitness = -1e100
         for genome, net in nets:
@@ -146,20 +142,6 @@ class PooledErrorCompute(object):
             genome_num+=1
             if genome.fitness > best_fitness: best_fitness = genome.fitness
         wandb.log({"Best fitness": best_fitness})
-
-   #    else:
-   #        with multiprocessing.Pool(self.num_workers) as pool:
-   #            jobs = []
-   #            for genome, net in nets:
-   #                jobs.append(pool.apply_async(compute_fitness,
-   #                                             (genome, net, self.test_episodes,
-   #                                              self.min_reward, self.max_reward)))
-
-   #            for job, (genome_id, genome) in zip(jobs, genomes):
-   #                reward_error = job.get(timeout=None)
-   #                genome.fitness = -np.sum(reward_error) / len(self.test_episodes)
-
-   #    print("final fitness compute time {0}\n".format(time.time() - t0))
 
 
 def run():
