@@ -24,11 +24,7 @@ NUM_CORES = 8
 repo = git.Repo(search_parent_directories=True)
 sha = repo.head.object.hexsha
 env = TrainWorld()
-wandb.init(project="Cogitopia NEAT monitor",
-           entity="torghauk-team",
-           config={"growth_rate": ws.grass_growth_rate,
-                   "git_hash": sha,
-                   "world_settings": ws.settings})
+
 
 #print("action space: {0!r}".format(env.action_space))
 #print("observation space: {0!r}".format(env.observation_space))
@@ -186,6 +182,11 @@ def run():
     # or the user interrupts the process.
     ec = PooledErrorCompute(NUM_CORES)
     while 1:
+        wandb.init(project="Cogitopia NEAT monitor",
+                   entity="torghauk-team",
+                   config={"growth_rate": ws.grass_growth_rate,
+                           "git_hash": sha,
+                           "world_settings": ws.settings})
         try:
             gen_best = pop.run(ec.evaluate_genomes, 7)
             wandb.log(len(pop.species))
