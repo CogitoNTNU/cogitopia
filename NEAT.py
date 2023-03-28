@@ -53,23 +53,32 @@ class LanderGenome(neat.DefaultGenome):
 
 
 def compute_fitness(genome, net, episodes, min_reward, max_reward):
-    m = int(round(np.log(0.01) / np.log(genome.discount)))
-    discount_function = [genome.discount ** (m - i) for i in range(m + 1)]
+    env = TrainWorld()
+    data = []
+    for i in range(1):
+        observation = [env.reset()]
+        step = 0
+        while 1:
+            step += 1
 
-    reward_error = []
-    for score, data in episodes:
-        # Compute normalized discounted reward.
-        dr = np.convolve(data[:, -1], discount_function)[m:]
-        dr = 2 * (dr - min_reward) / (max_reward - min_reward) - 1.0
-        dr = np.clip(dr, -1.0, 1.0)
+            actions = []
+            output = net.activate(observation[0].flatten())
+            actions.append(np.argmax(output))
 
-        for row, dr in zip(data, dr):
-            observation = row[:245]
-            action = int(row[8])
-            output = net.activate(observation)
-            reward_error.append(float((output[action] - dr) ** 2))
+            for i in range(min(len(observation) - 1, len(env.agents))):
+                output = net.activate(observation[i + 1].flatten())
+                actions.append(np.argmax(output))
 
-    return reward_error
+            if actions[0] != 0: print(actions[0])
+            observation, reward, done, info = env.step(actions)
+            data.append(np.hstack((observation[0].flatten(), actions[0], reward)))
+
+            if done:
+                break
+
+    data = np.array(data)
+    score = np.sum(data[:, -1])/2
+    return score
 
 
 class PooledErrorCompute(object):
@@ -86,43 +95,18 @@ class PooledErrorCompute(object):
 
     def simulate(self, nets):
         scores = []
-        for genome, net in nets:
-            observation = [env.reset()]
-            step = 0
-            data = []
-            while 1:
-                step += 1
+        with multiprocessing.Pool(self.num_workers) as pool:
+            jobs = []
+            for genome, net in nets:
+                jobs.append(pool.apply_async(compute_fitness,
+                                             (genome, net, self.test_episodes,
+                                              self.min_reward, self.max_reward)))
 
-                actions = []
-                if step < 200 and random.random() < 0.2:
-                    actions.append(env.action_space.sample())
-                else:
-                    output = net.activate(observation[0].flatten())
-                    actions.append(np.argmax(output))
+            for job, (genome_id, genome) in zip(jobs, nets):
+                reward = job.get(timeout=None)
+                scores.append(reward)
+        self.episode_score = scores
 
-                for i in range(min(len(observation)-1, len(env.agents))):
-                    if step < 200 and random.random() < 0.2:
-                        actions.append(env.action_space.sample())
-                    else:
-                        output = net.activate(observation[i+1].flatten())
-                        actions.append(np.argmax(output))
-
-
-
-
-                observation, reward, done, info = env.step(actions)
-                data.append(np.hstack((observation[0].flatten(), actions[0], reward)))
-
-                if done:
-                    break
-
-            data = np.array(data)
-            score = np.sum(data[:, -1])
-            self.episode_score.append(score)
-            scores.append(score)
-            self.episode_length.append(step)
-
-            self.test_episodes.append((score, data))
 
         print("Score range [{:.3f}, {:.3f}]".format(min(scores), max(scores)))
 
@@ -136,6 +120,7 @@ class PooledErrorCompute(object):
 
         print("network creation time {0}".format(time.time() - t0))
         t0 = time.time()
+        self.simulate(nets)
 
         # Periodically generate a new set of episodes for comparison.
         if 1 == self.generation % 10:
@@ -147,23 +132,26 @@ class PooledErrorCompute(object):
         # Assign a composite fitness to each genome; genomes can make progress either
         # by improving their total reward or by making more accurate reward estimates.
         print("Evaluating {0} test episodes".format(len(self.test_episodes)))
-        if self.num_workers < 2:
-            for genome, net in nets:
-                reward_error = compute_fitness(genome, net, self.test_episodes, self.min_reward, self.max_reward)
-                genome.fitness = -np.sum(reward_error) / len(self.test_episodes)
-        else:
-            with multiprocessing.Pool(self.num_workers) as pool:
-                jobs = []
-                for genome, net in nets:
-                    jobs.append(pool.apply_async(compute_fitness,
-                                                 (genome, net, self.test_episodes,
-                                                  self.min_reward, self.max_reward)))
+     #   if self.num_workers < 2:
+        genome_num = 0
+        for genome, net in nets:
+            #reward_error = compute_fitness(genome, net, self.test_episodes, self.min_reward, self.max_reward)
+            genome.fitness = np.sum(self.episode_score[genome_num])
+            genome_num+=1
 
-                for job, (genome_id, genome) in zip(jobs, genomes):
-                    reward_error = job.get(timeout=None)
-                    genome.fitness = -np.sum(reward_error) / len(self.test_episodes)
+   #    else:
+   #        with multiprocessing.Pool(self.num_workers) as pool:
+   #            jobs = []
+   #            for genome, net in nets:
+   #                jobs.append(pool.apply_async(compute_fitness,
+   #                                             (genome, net, self.test_episodes,
+   #                                              self.min_reward, self.max_reward)))
 
-        print("final fitness compute time {0}\n".format(time.time() - t0))
+   #            for job, (genome_id, genome) in zip(jobs, genomes):
+   #                reward_error = job.get(timeout=None)
+   #                genome.fitness = -np.sum(reward_error) / len(self.test_episodes)
+
+   #    print("final fitness compute time {0}\n".format(time.time() - t0))
 
 
 def run():
@@ -225,14 +213,14 @@ def run():
                     actions = []
                     votes = np.zeros((8,))
                     for n in best_networks:
-                        output = n.activate(observation[0])
+                        output = n.activate(observation[0].flatten())
                         votes[np.argmax(output)] += 1
 
                     actions.append(np.argmax(votes))
-                    for i in range(min(len(observation-1), len(env.agents))):
+                    for i in range(min(len(observation)-1, len(env.agents))):
                         votes = np.zeros((8,))
                         for n in best_networks:
-                            output = n.activate(observation[i+1])
+                            output = n.activate(observation[i+1].flatten())
                             votes[np.argmax(output)] += 1
 
                         actions.append(np.argmax(votes))

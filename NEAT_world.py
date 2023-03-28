@@ -87,6 +87,7 @@ class TrainWorld(gym.Env):
         self.player.action = action[0]
         for i in range(min(len(action)-1, len(self.agents))):
             self.agents[i].action = action[i+1]
+            self.agents[i].step()
         self.player.step()
         self.world.step()
         survive = self.player.tick()
