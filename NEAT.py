@@ -90,7 +90,7 @@ class PooledErrorCompute(object):
         self.generation = 0
 
         self.min_reward = -200
-        self.max_reward = 200
+        self.max_reward = 2000
 
         self.episode_score = []
         self.episode_length = []
@@ -136,14 +136,12 @@ class PooledErrorCompute(object):
         print("Evaluating {0} test episodes".format(len(self.test_episodes)))
         genome_num = 0
         best_fitness = -1e100
-        fitness_sum = 0
         for genome, net in nets:
             #reward_error = compute_fitness(genome, net, self.test_episodes, self.min_reward, self.max_reward)
             genome.fitness = np.sum(self.episode_score[genome_num])
             genome_num+=1
-            fitness_sum += genome.fitness
             if genome.fitness > best_fitness: best_fitness = genome.fitness
-        wandb.log({"Best fitness": best_fitness, "Total fitness": fitness_sum})
+        wandb.log({"Best fitness": best_fitness, "Mean fitness": np.mean(self.episode_score)})
 
 
 def run():
