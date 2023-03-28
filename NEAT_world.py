@@ -115,13 +115,13 @@ class TrainWorld(gym.Env):
 
 
         # Death
-        reward += len(list(filter(lambda x: not x.creature.predator, self.agents))) + self.player.food-0.3
+        reward += len(list(filter(lambda x: not x.creature.predator, self.agents))) + self.player.creature.food-0.3
         survive = self.player.tick()
         self.player.vision()
         state = [np.stack((np.array(self.player.grass), np.array(self.player.walkable), np.array(self.player.other_creatures), np.array(self.player.other_dead_creatures), np.ones((self.player.vision_range*2+1, self.player.vision_range*2+1))*food_0))]
         for agent in self.agents:
             agent.vision()
-            reward += agent.food-0.3
+            reward += agent.creature.food-0.3
             agentstate = [np.stack((np.array(agent.grass), np.array(agent.walkable),
                                np.array(agent.other_creatures), np.array(agent.other_dead_creatures),
                                np.ones((agent.vision_range * 2 + 1, agent.vision_range * 2 + 1)) * food_0))]
