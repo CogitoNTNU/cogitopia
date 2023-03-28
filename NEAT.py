@@ -145,7 +145,7 @@ class PooledErrorCompute(object):
             genome.fitness = np.sum(self.episode_score[genome_num])
             genome_num+=1
             if genome.fitness > best_fitness: best_fitness = genome.fitness
-        wandb.log(best_fitness)
+        wandb.log({"Best fitness": best_fitness})
 
    #    else:
    #        with multiprocessing.Pool(self.num_workers) as pool:
@@ -181,15 +181,15 @@ def run():
     # Run until the winner from a generation is able to solve the environment
     # or the user interrupts the process.
     ec = PooledErrorCompute(NUM_CORES)
+    wandb.init(project="Cogitopia NEAT monitor",
+               entity="torghauk-team",
+               config={"growth_rate": ws.grass_growth_rate,
+                       "git_hash": sha,
+                       "world_settings": ws.settings})
     while 1:
-        wandb.init(project="Cogitopia NEAT monitor",
-                   entity="torghauk-team",
-                   config={"growth_rate": ws.grass_growth_rate,
-                           "git_hash": sha,
-                           "world_settings": ws.settings})
         try:
             gen_best = pop.run(ec.evaluate_genomes, 7)
-            wandb.log(len(pop.species))
+            wandb.log({"num_species": len(pop.species)})
 
             # print(gen_best)
 
