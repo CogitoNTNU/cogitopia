@@ -70,7 +70,10 @@ class TrainWorld(gym.Env):
             else:
                 action = list(action)
         for i in range(len(action)):
-            self.players[i].action = action[i][0]
+            try:
+                self.players[i].action = action[i][0]
+            except:
+                pass
             for j in range(min(len(action)-1, len(self.agents[i]))):
                 self.agents[i][j].action = action[i][j+1]
                 self.agents[i][j].step()

@@ -198,31 +198,31 @@ def run():
             solved = True
             best_scores = []
             for k in range(100):
-                observation = [env.reset()]
+                observation = [[env.reset()]]
                 score = 0
                 step = 0
                 while 1:
                     step += 1
                     # Use the total reward estimates from all five networks to
                     # determine the best action given the current state.
-                    actions = []
+                    actions = [[]]
                     votes = np.zeros((8,))
                     for n in best_networks:
-                        output = n.activate(observation[0].flatten())
+                        output = n.activate(observation[0][0].flatten())
                         votes[np.argmax(output)] += 1
 
-                    actions.append(np.argmax(votes))
-                    for i in range(min(len(observation)-1, len(env.agents))):
+                    actions[0].append(np.argmax(votes))
+                    for i in range(min(len(observation)-1, len(env.agents[0]))):
                         votes = np.zeros((8,))
                         for n in best_networks:
-                            output = n.activate(observation[i+1].flatten())
+                            output = n.activate(observation[0][i+1].flatten())
                             votes[np.argmax(output)] += 1
 
-                        actions.append(np.argmax(votes))
+                        actions[0].append(np.argmax(votes))
 
 
                     observation, reward, done, info = env.step(actions)
-                    score += reward
+                    score += reward[0]
                     #env.render()
                     if done:
                         break
