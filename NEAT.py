@@ -23,7 +23,7 @@ ws = WorldSettings()
 NUM_CORES = 8
 repo = git.Repo(search_parent_directories=True)
 sha = repo.head.object.hexsha
-env = TrainWorld()
+env = TrainWorld(8)
 
 
 
@@ -54,32 +54,31 @@ class LanderGenome(neat.DefaultGenome):
         return f"Reward discount: {self.discount}\n{super().__str__()}"
 
 
-def compute_fitness(genome, net, episodes, min_reward, max_reward):
-    env = TrainWorld()
+def compute_fitness(genomes, nets, episodes, min_reward, max_reward):
+    env = TrainWorld(len(genomes))
     data = []
     for i in range(1):
-        observation = [env.reset()]
+        observation = [[env.reset()]]*len(genomes)
         step = 0
         while 1:
             step += 1
+            actions = [[]] * len(genomes)
 
-            actions = []
-            output = net.activate(observation[0].flatten())
-            actions.append(np.argmax(output))
-
-            for i in range(min(len(observation) - 1, len(env.agents))):
-                output = net.activate(observation[i + 1].flatten())
-                actions.append(np.argmax(output))
+            for j in range(len(genomes)):
+                output = nets[j].activate(observation[j][0].flatten())
+                actions[j].append(np.argmax(output))
+                for i in range(min(len(observation[j]) - 1, len(env.agents[j]))):
+                    output = nets[j].activate(observation[j][i + 1].flatten())
+                    actions[j].append(np.argmax(output))
 
             #if actions[0] != 0: print(actions[0])
             observation, reward, done, info = env.step(actions)
-            data.append(np.hstack((observation[0].flatten(), actions[0], reward)))
+            data.append(np.array(reward))
 
             if done:
                 break
-
     data = np.array(data)
-    score = np.sum(data[:, -1])/2
+    score = [np.sum(data[:, i]) for i in range(len(genomes))]
     return score
 
 
@@ -99,14 +98,14 @@ class PooledErrorCompute(object):
         scores = []
         with multiprocessing.Pool(self.num_workers) as pool:
             jobs = []
-            for genome, net in nets:
+            for i in range(self.num_workers):
                 jobs.append(pool.apply_async(compute_fitness,
-                                             (genome, net, self.test_episodes,
+                                             ([net[0] for net in nets], [net[1] for net in nets], self.test_episodes,
                                               self.min_reward, self.max_reward)))
 
-            for job, (genome_id, genome) in zip(jobs, nets):
+            for job  in jobs:
                 reward = job.get(timeout=None)
-                scores.append(reward)
+                scores = np.divide(reward, self.num_workers)
         self.episode_score = scores
 
 

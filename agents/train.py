@@ -9,8 +9,9 @@ class TrainAgent(AgentBase):
 
     OWN_POS = 0, 0
 
-    def __init__(self, world, creature):
+    def __init__(self, world, creature, i = 0):
         self.vision_range = 3
+        self.i = i
         self.grass = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.walkable = np.zeros((self.vision_range * 2 + 1, self.vision_range * 2 + 1))
         self.other_creatures = np.array([np.array([len([]) for _ in range(self.vision_range * 2 +1)]) for _ in range(self.vision_range * 2 + 1)])
