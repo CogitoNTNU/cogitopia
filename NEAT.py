@@ -227,9 +227,6 @@ def run():
                     if done:
                         break
 
-                ec.episode_score.append(score)
-                ec.episode_length.append(step)
-
                 best_scores.append(score)
                 avg_score = sum(best_scores) / len(best_scores)
                 print(k, score, avg_score)
