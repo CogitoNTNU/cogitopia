@@ -57,20 +57,20 @@ class LanderGenome(neat.DefaultGenome):
 def compute_fitness(genomes, nets, episodes, min_reward, max_reward):
     env = TrainWorld(len(genomes))
     data = []
-    for i in range(1):
-        observation = [[env.reset()]]*len(genomes)
+    for _ in range(1):
+        obs_1 = env.reset()
+        observation = [[obs_1.copy()]for _ in range(len(genomes))]
         step = 0
         while 1:
             step += 1
-            actions = [[]] * len(genomes)
+            actions = [[] for _ in range(len(genomes))]
 
             for j in range(len(genomes)):
                 output = nets[j].activate(observation[j][0].flatten())
                 actions[j].append(np.argmax(output))
-                for i in range(min(len(observation[j]) - 1, len(env.agents[j]))):
-                    output = nets[j].activate(observation[j][i + 1].flatten())
+                for k in range(min(len(observation[j]) - 1, len(env.agents[j]))):
+                    output = nets[j].activate(observation[j][k + 1].flatten())
                     actions[j].append(np.argmax(output))
-
             #if actions[0] != 0: print(actions[0])
             observation, reward, done, info = env.step(actions)
             data.append(np.array(reward))
@@ -95,7 +95,7 @@ class PooledErrorCompute(object):
         self.episode_length = []
 
     def simulate(self, nets):
-        scores = []
+        scores = np.zeros(len(nets))
         with multiprocessing.Pool(self.num_workers) as pool:
             jobs = []
             for i in range(self.num_workers):
@@ -103,9 +103,9 @@ class PooledErrorCompute(object):
                                              ([net[0] for net in nets], [net[1] for net in nets], self.test_episodes,
                                               self.min_reward, self.max_reward)))
 
-            for job  in jobs:
-                reward = job.get(timeout=None)
-                scores = np.divide(reward, self.num_workers)
+            for i in range(len(jobs)):
+                reward = jobs[i].get(timeout=None)
+                scores += np.divide(reward, self.num_workers)
         self.episode_score = scores
 
 
